@@ -1,0 +1,12 @@
+[
+  { "id": "modul1", "judul": "Pengenalan Dasar Sampah", "deskripsi": "Memahami pentingnya pengelolaan sampah sejak dini.", "file": "modul1.pdf" },
+  { "id": "modul2", "judul": "Jenis-Jenis Sampah", "deskripsi": "Kenali berbagai jenis sampah dan cara menanganinya.", "file": "modul2.pdf" },
+  { "id": "modul3", "judul": "Perjalanan Sampah", "deskripsi": "Pelajari bagaimana proses perjalanan sampah untuk lingkungan yang lebih baik.", "file": "modul3.pdf" },
+  { "id": "modul4", "judul": "Fakta Menarik Tentang Sampah", "deskripsi": "Temukan fakta-fakta mengejutkan tentang dampak sampah di sekitar kita.", "file": "modul4.pdf" },
+  { "id": "modul5", "judul": "Sampah Plastik", "deskripsi": "Pelajari karakteristik sampah plastik dan tantangannya bagi lingkungan.", "file": "modul5.pdf" },
+  { "id": "modul6", "judul": "Manfaat Plastik", "deskripsi": "Pahami sisi positif dari penggunaan plastik secara bijak.", "file": "modul6.pdf" },
+  { "id": "modul7", "judul": "Dampak Sampah Plastik", "deskripsi": "Pelajari dampak plastik terhadap lingkungan, kesehatan, dan kehidupan sehari-hari.", "file": "modul7.pdf" },
+  { "id": "modul8", "judul": "Upaya Mengurangi Sampah", "deskripsi": "Pelajari berbagai langkah sederhana untuk mengurangi sampah.", "file": "modul8.pdf" },
+  { "id": "modul9", "judul": "Peran Masyarakat", "deskripsi": "Ketahui bagaimana masyarakat bisa ikut aktif mengelola sampah di lingkungan sekitar.", "file": "modul9.pdf" },
+  { "id": "modul10", "judul": "Rancangan Pengelolaan Sampah untuk Diri Sendiri", "deskripsi": "Pelajari cara membuat rencana sederhana pengelolaan sampah pribadi.", "file": "modul10.pdf" }
+]

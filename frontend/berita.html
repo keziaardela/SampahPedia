@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Berita | SampahPedia</title>
+  <link rel="stylesheet" href="style/berita.css" />
+  <link rel="icon" type="image/png" href="gambar.img/favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<script src="js/auth-ui.js" defer></script>
+<body>
+
+<!-- ==== Navbar ==== -->
+<nav class="navbar">
+  <div class="left-nav">
+    <!-- Tombol hamburger -->
+    <button class="menu-btn" id="menuBtn">
+      <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Logo -->
+    <div class="logo">🌿 SampahPedia</div>
+  </div>
+
+  <!-- LOGIN / REGISTER -->
+  <ul class="nav-links" id="authButtons">
+    <li><a href="register.html">Daftar</a></li>
+    <li><a href="login.html">Masuk</a></li>
+  </ul>
+
+  <!-- USER MENU (LOGIN STATE) -->
+  <div class="nav-user hidden" id="userMenu">
+    <div class="user-trigger" id="userTrigger">
+      <span class="user-icon">👤</span>
+      <span id="userName">User</span>
+    </div>
+
+    <div class="user-dropdown hidden" id="userDropdown">
+      <a href="profile.html">Profil</a>
+      <a href="admin.html" id="adminLink" class="hidden">Admin</a>
+      <button id="btnLogout">Logout</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- ==== Sidebar Menu ==== -->
+  <div class="sidebar" id="sidebar">
+    <button class="close-btn" id="closeBtn">✕</button>
+    <ul>
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="edukasi.html">Edukasi</a></li>
+      <li><a href="berita.html">Berita</a></li>
+      <li><a href="komunitas.html">Komunitas</a></li>
+    </ul>
+  </div>
+
+  <script src="js/sidebar.js"></script>
+
+
+  <!-- ==== Berita Kegiatan ==== -->
+  <section class="news-header">
+    <h1>Berita Kegiatan</h1>
+    <p>Berbagai aksi nyata dan kegiatan peduli lingkungan di berbagai daerah 🌿</p>
+  </section>
+
+  <section class="news-section">
+    <!-- WAJIB kosong, JANGAN ADA CARD STATIS -->
+    <div class="news-container" id="newsContainer"></div>
+  </section>
+
+
+  <!-- ==== Tentang Kami ==== -->
+  <section class="about">
+    <!-- isi tentang kami (kalau ada) -->
+  </section>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-content">
+
+        <!-- Kolom Kiri: Brand -->
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <div class="logo-icon">S</div>
+            <div class="brand-name">Sampahpedia</div>
+          </div>
+
+          <p class="brand-description">
+            Platform Edukasi Sampah yang mudah, seru dan bisa dipraktikkan langsung
+            dalam kehidupan sehari-hari untuk Indonesia yang lebih hijau.
+          </p>
+
+          <div class="social-icons">
+            <div class="social-icon">
+              <!-- Facebook SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+
+            <div class="social-icon">
+              <!-- Instagram SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+              </svg>
+            </div>
+
+            <div class="social-icon">
+              <!-- Twitter SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom Tengah: Quick Links -->
+        <div class="footer-links">
+          <h3>Quick Links</h3>
+          <ul class="links-list">
+            <li><a href="#">Beranda</a></li>
+            <li><a href="#">Belajar</a></li>
+            <li><a href="#">Komunitas</a></li>
+            <li><a href="#">Tentang Kami</a></li>
+          </ul>
+        </div>
+
+        <!-- Kolom Kanan: Kontak -->
+        <div class="footer-contact">
+          <h3>Kontak</h3>
+          <ul class="contact-list">
+            <li>
+              <div class="contact-icon">📧</div>
+              <div class="contact-text">hello@sampahpedia.com</div>
+            </li>
+            <li>
+              <div class="contact-icon">📞</div>
+              <div class="contact-text">+62-9999-9999-9999</div>
+            </li>
+            <li>
+              <div class="contact-icon">📍</div>
+              <div class="contact-text">Bali, Indonesia</div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Divider -->
+      <div class="footer-divider"></div>
+
+      <!-- Copyright -->
+      <div class="copyright">
+        <p>
+          &copy; 2026 SampahPedia. All rights reserved.
+          Made with <span class="heart">♥</span> for our planet.
+        </p>
+        <p class="developer">Developed by Kelompok 5</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/news.js" defer></script>
+
+</body>
+</html>

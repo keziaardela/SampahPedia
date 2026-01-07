@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SampahPedia Bali | Edukasi Sampah</title>
+  <link rel="stylesheet" href="style/index.css" />
+  <link rel="icon" type="image/png" href="gambar.img/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<script src="js/auth-ui.js" defer></script>
+<body>
+
+<!-- ==== Navbar ==== -->
+<nav class="navbar">
+  <div class="left-nav">
+    <!-- Tombol hamburger -->
+    <button class="menu-btn" id="menuBtn">
+      <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Logo -->
+    <div class="logo">🌿 SampahPedia</div>
+  </div>
+
+  <!-- LOGIN / REGISTER -->
+  <ul class="nav-links" id="authButtons">
+    <li><a href="register.html">Daftar</a></li>
+    <li><a href="login.html">Masuk</a></li>
+  </ul>
+
+  <!-- USER MENU (LOGIN STATE) -->
+  <div class="nav-user hidden" id="userMenu">
+    <div class="user-trigger" id="userTrigger">
+      <span class="user-icon">👤</span>
+      <span id="userName">User</span>
+    </div>
+
+    <div class="user-dropdown hidden" id="userDropdown">
+      <a href="profile.html">Profil</a>
+      <a href="admin.html" id="adminLink" class="hidden">Admin</a>
+      <button id="btnLogout">Logout</button>
+    </div>
+  </div>
+</nav>
+
+
+  <!-- ==== Sidebar Menu ==== -->
+  <div class="sidebar" id="sidebar">
+    <button class="close-btn" id="closeBtn">✕</button>
+    <ul>
+      <li><a href="#beranda">Beranda</a></li>
+      <li><a href="edukasi.html">Edukasi</a></li>
+      <li><a href="berita.html">Berita</a></li>
+      <li><a href="komunitas.html">Komunitas</a></li>
+    </ul>
+  </div>
+
+  <script src="js/sidebar.js"></script>
+
+<!-- ==== Hero Section ==== -->
+<section id="beranda" class="hero">
+  <div class="hero-text">
+    <h1>
+      <span class="highlight">Siap</span> Menjadi<br>
+      Bagian dari<br>
+      <span class="green-box">Perubahan?</span>
+    </h1>
+    <p>
+      Belajar memilah, mengolah, dan <br>
+      mengurangi sampah dengan cara <br>
+      yang mudah dan menyenangkan.
+    </p>
+    <div class="buttons">
+      <a href="#edukasi" class="btn green">Get Started</a>
+    </div>
+  </div>
+
+  <div class="hero-image">
+    <img src="gambar.img/bg3.jpg" alt="Lingkungan Hidup Bersih" />
+  </div>
+</section>
+
+  <!-- ==== Edukasi ==== -->
+  <section class="education" id="edukasi">
+    <h2>Sampah tuh apa sih?</h2>
+    <div class="edu-container">
+      <div class="edu-box yellow">
+        <h3>♻ Pengertian</h3>
+        <p>Sampah adalah sisa kegiatan manusia atau proses alam yang sudah tidak digunakan lagi. Pengelolaan yang tepat sangat penting agar tidak mencemari lingkungan.</p>
+      </div>
+
+      <div class="edu-box blue">
+        <h3>🗑 Jenis Sampah dan Contoh</h3>
+        <p>
+          Sampah organik: sisa makanan, daun kering. <br>
+          Sampah anorganik: plastik, kaca, logam. <br>
+          Sampah B3: baterai, obat kadaluarsa.
+        </p>
+      </div>
+
+      <div class="edu-box green">
+        <h3>📊 Fakta Tentang Sampah</h3>
+        <p>Indonesia menghasilkan lebih dari 60 juta ton sampah setiap tahun, dan sekitar 17% di antaranya berasal dari plastik sekali pakai.</p>
+      </div>
+
+      <div class="edu-box purple">
+        <h3>🌱 Cara Mengolah Sampah</h3>
+        <p>Pisahkan sampah sesuai jenisnya, daur ulang yang bisa digunakan ulang, dan komposkan sampah organik agar menjadi pupuk alami.</p>
+      </div>
+    </div>
+
+    <div class="edu-guide">
+      <a href="edukasi.html" class="btn green">Pelajari Lebih Lanjut 📘</a>
+    </div>
+  </section>
+
+  <!-- ==== Statistik ==== -->
+  <section id="statistik" class="statistics">
+    <h2>📊 Statistik Pengelolaan Sampah di Bali</h2>
+    <p>Data berikut menggambarkan kondisi umum pengelolaan sampah di beberapa kabupaten di Provinsi Bali.</p>
+
+    <div class="chart-container">
+      <div class="chart-box">
+        <canvas id="chartJenisBali"></canvas>
+        <p><strong>Persentase Jenis Sampah di Bali</strong></p>
+      </div>
+
+      <div class="chart-box">
+        <canvas id="chartKabupatenBali"></canvas>
+        <p><strong>Jumlah Sampah per Kabupaten (ton/hari)</strong></p>
+      </div>
+
+      <div class="chart-box">
+        <canvas id="chartDaurBali"></canvas>
+        <p><strong>Tingkat Daur Ulang di Bali per Tahun</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/chart.js"></script>
+
+  <!-- ==== Berita ==== -->
+  <section id="berita" class="news">
+    <h2>Berita Kegiatan</h2>
+    <p class="subtitle">Dokumentasi kegiatan dan aksi nyata peduli lingkungan 🌿</p>
+
+    <div class="news-container">
+      <div class="news-item">
+        <img src="gambar.img/gotongroyong.jpg" alt="Gotong royong di Jimbaran">
+        <h3>Ribuan Masyarakat Bali Gotong Royong Bersihkan Pasar Badung dan Kumbasari</h3>
+        <p>Kegiatan ini dilakukan pada tanggal 14 September 2025 agar pasar dapat berfungsi kembali seperti sedia kala.</p>
+      </div>
+
+      <div class="news-item">
+        <img src="gambar.img/bank-sampah.png" alt="Bank Sampah Denpasar">
+        <h3>Dinas Kesehatan Provinsi Bali Bentuk Bank Sampah SEGER</h3>
+        <p>Kegiatan ini merupakan strategi pengelolaan sampah anorganik yang bersumber dari hasil kegiatan institusi maupun rumah tangga.</p>
+      </div>
+
+      <div class="news-item">
+        <img src="gambar.img/buleleng.png" alt="Edukasi Sekolah">
+        <h3>Hijaukan Bali, Buleleng Gelar Gotong Royong Semesta Berencana</h3>
+        <p>Pemkab Buleleng menggelar kegiatan penanaman pohon dan bersih sungai di Sungai Banyumala, Kelurahan Banyuasri, Minggu (26/10/2025).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==== Komunitas ==== -->
+  <section id="komunitas" class="community">
+    <h2>Bergabung dengan Komunitas</h2>
+    <p class="subtitle">Gabung bareng pegiat lingkungan di Bali dan mulai aksi kecilmu hari ini! 🌍</p>
+
+    <div class="community-container">
+      <div class="community-box">
+        <img src="gambar.img/komunitas-bali2.jpg" alt="Komunitas Peduli Sampah Bali">
+        <h3>Komunitas Peduli Sampah Bali</h3>
+        <p>Bersama komunitas ini, kamu bisa ikut kegiatan bersih pantai, edukasi sampah, dan kampanye hijau di seluruh Bali.</p>
+        <a href="https://chat.whatsapp.com/EPJs9b6h8TX0xMRiEYfm2P?mode=wwt" target="_blank" class="btn green">Gabung Sekarang 💬</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==== Tentang Kami ==== -->
+  <section class="about">
+    <!-- isi tentang kami (kalau ada) -->
+  </section>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-content">
+
+        <!-- Kolom Kiri: Brand -->
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <div class="logo-icon">S</div>
+            <div class="brand-name">Sampahpedia</div>
+          </div>
+
+          <p class="brand-description">
+            Platform Edukasi Sampah yang mudah, seru dan bisa dipraktikkan langsung
+            dalam kehidupan sehari-hari untuk Indonesia yang lebih hijau.
+          </p>
+
+          <div class="social-icons">
+            <div class="social-icon">
+              <!-- Facebook SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+
+            <div class="social-icon">
+              <!-- Instagram SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+              </svg>
+            </div>
+
+            <div class="social-icon">
+              <!-- Twitter SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom Tengah: Quick Links -->
+        <div class="footer-links">
+          <h3>Quick Links</h3>
+          <ul class="links-list">
+            <li><a href="#">Beranda</a></li>
+            <li><a href="#">Belajar</a></li>
+            <li><a href="#">Komunitas</a></li>
+            <li><a href="#">Tentang Kami</a></li>
+          </ul>
+        </div>
+
+        <!-- Kolom Kanan: Kontak -->
+        <div class="footer-contact">
+          <h3>Kontak</h3>
+          <ul class="contact-list">
+            <li>
+              <div class="contact-icon">📧</div>
+              <div class="contact-text">hello@sampahpedia.com</div>
+            </li>
+            <li>
+              <div class="contact-icon">📞</div>
+              <div class="contact-text">+62-9999-9999-9999</div>
+            </li>
+            <li>
+              <div class="contact-icon">📍</div>
+              <div class="contact-text">Bali, Indonesia</div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Divider -->
+      <div class="footer-divider"></div>
+
+      <!-- Copyright -->
+      <div class="copyright">
+        <p>
+          &copy; 2026 SampahPedia. All rights reserved.
+          Made with <span class="heart">♥</span> for our planet.
+        </p>
+        <p class="developer">Developed by Kelompok 5</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

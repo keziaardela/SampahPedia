@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin | SampahPedia</title>
+
+  <link rel="icon" type="image/png" href="gambar.img/favicon.png">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Admin CSS -->
+  <link rel="stylesheet" href="style/admin.css" />
+</head>
+
+<body>
+
+  <!-- =============================
+       TOPBAR
+  ============================== -->
+  <nav class="topbar">
+    <div class="brand">
+      🌿 SampahPedia <span>Admin</span>
+    </div>
+    <div class="actions">
+      <button id="btnRefresh" class="btn ghost">Refresh</button>
+      <button id="btnLogout" class="btn danger">Logout</button>
+    </div>
+  </nav>
+
+  <!-- =============================
+       MAIN CONTENT
+  ============================== -->
+  <main class="container">
+
+    <!-- =============================
+         MODULE & QUIZ SECTION
+    ============================== -->
+    <section class="grid">
+
+      <!-- LEFT: MODULE FORM -->
+      <div class="card">
+        <h2>Kelola Modul</h2>
+        <p class="muted">
+          Tambah / edit / hapus modul.  
+          File cukup isi nama file PDF (contoh: <b>modul1.pdf</b>).
+        </p>
+
+        <form id="moduleForm" class="form">
+          <input type="hidden" id="moduleId" />
+
+          <label>Judul Modul</label>
+          <input
+            id="moduleTitle"
+            type="text"
+            placeholder="Judul modul..."
+            required
+          />
+
+          <label>Deskripsi</label>
+          <textarea
+            id="moduleDesc"
+            rows="3"
+            placeholder="Deskripsi modul..."
+          ></textarea>
+
+          <label>File PDF (nama file)</label>
+          <input
+            id="moduleFile"
+            type="text"
+            placeholder="modul1.pdf"
+          />
+
+          <div class="row">
+            <button
+              type="submit"
+              class="btn primary"
+              id="btnSaveModule">
+              Simpan Modul
+            </button>
+            <button
+              type="button"
+              class="btn ghost"
+              id="btnResetModule">
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- RIGHT: QUIZ FORM -->
+      <div class="card">
+        <h2>Kelola Quiz (3 soal)</h2>
+        <p class="muted">
+          Pilih modul dari daftar, lalu isi quiz.
+          Jawaban benar pilih satu (radio).
+        </p>
+
+        <div class="form">
+          <label>Modul dipilih</label>
+          <input
+            id="quizModuleInfo"
+            type="text"
+            disabled
+            value="Belum dipilih"
+          />
+
+          <label>Judul Quiz</label>
+          <input
+            id="quizTitle"
+            type="text"
+            placeholder="Quiz Modul ..."
+          />
+
+          <div id="quizBuilder"></div>
+
+          <div class="row">
+            <button
+              class="btn primary"
+              id="btnSaveQuiz"
+              type="button"
+              disabled>
+              Simpan Quiz
+            </button>
+            <button
+              class="btn danger"
+              id="btnDeleteQuiz"
+              type="button"
+              disabled>
+              Hapus Quiz
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =============================
+         MODULE LIST
+    ============================== -->
+    <section class="card">
+      <h2>Daftar Modul</h2>
+      <p class="muted">
+        Klik <b>Edit</b> untuk mengubah modul,
+        klik <b>Quiz</b> untuk mengelola quiz modul tersebut.
+      </p>
+
+      <div class="tableWrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Judul</th>
+              <th>File</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="modulesTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =============================
+         ADMIN - KELOLA KOMUNITAS
+    ============================== -->
+    <section class="card" id="communityAdminSection">
+      <h2>Kelola Request Komunitas</h2>
+      <p class="muted">
+        Approve untuk menjadikan user sebagai akun komunitas (role: <b>community</b>).
+        Reject untuk menolak.
+        Untuk komunitas yang sudah disetujui, admin dapat
+        <b>menghapus status community</b> dan mengembalikannya menjadi user.
+      </p>
+
+      <div class="tableWrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Pengaju</th>
+              <th>Email</th>
+              <th>Nama Komunitas</th>
+              <th>Kota</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="communityReqTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =============================
+        ADMIN - KELOLA JADWAL KEGIATAN
+    ============================= -->
+    <section class="card" id="eventAdminSection">
+      <h2>Tambah Jadwal Kegiatan</h2>
+      <p class="muted">
+        Tambah, edit, dan hapus jadwal kegiatan komunitas.
+        Jadwal yang disimpan akan langsung tampil di halaman publik.
+      </p>
+
+      <!-- LIST EVENT -->
+      <div id="adminEventList" class="event-list" style="margin-bottom:20px;"></div>
+
+      <!-- FORM TAMBAH / EDIT EVENT -->
+      <form id="adminEventForm" class="form">
+        <input type="hidden" id="adminEventId" />
+
+        <label>Judul Kegiatan</label>
+        <input
+          type="text"
+          id="adminEventTitle"
+          placeholder="Judul kegiatan"
+          required
+        />
+
+        <label>Tanggal</label>
+        <input
+          type="date"
+          id="adminEventDate"
+          required
+        />
+
+        <label>Lokasi</label>
+        <input
+          type="text"
+          id="adminEventLocation"
+          placeholder="Lokasi kegiatan"
+          required
+        />
+
+        <label>Deskripsi</label>
+        <textarea
+          id="adminEventDesc"
+          rows="3"
+          placeholder="Deskripsi kegiatan"
+          required
+        ></textarea>
+
+        <label>Link Gambar (opsional)</label>
+        <input
+          type="text"
+          id="adminEventImage"
+          placeholder="https://..."
+        />
+
+        <label>Link WhatsApp (opsional)</label>
+        <input
+          type="text"
+          id="adminEventWA"
+          placeholder="https://chat.whatsapp.com/..."
+        />
+
+        <div class="row">
+          <button type="submit" class="btn primary">
+            Simpan Jadwal
+          </button>
+          <button type="button" id="btnCancelEvent" class="btn ghost hidden">
+            Batal
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- =============================
+        ADMIN - KELOLA JADWAL KEGIATAN
+    ============================= -->
+    <section class="card">
+      <h2>Kelola Jadwal Kegiatan</h2>
+      <p class="muted">
+        Admin dapat mengedit dan menghapus semua jadwal kegiatan komunitas.
+      </p>
+
+      <div class="tableWrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Judul</th>
+              <th>Tanggal</th>
+              <th>Lokasi</th>
+              <th>Deskripsi</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="adminEventsTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =============================
+      ADMIN - KELOLA BERITA KEGIATAN
+    ============================= -->
+    <section class="admin-news-section">
+      <h2>Kelola Berita Kegiatan</h2>
+
+      <form id="newsForm">
+        <div class="form-group">
+          <label>Judul Berita</label>
+          <input type="text" id="newsTitle" placeholder="Masukkan judul berita" required>
+        </div>
+
+        <div class="form-group">
+          <label>Deskripsi Berita</label>
+          <textarea id="newsDescription" placeholder="Masukkan deskripsi berita" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Gambar Berita</label>
+          <input type="file" id="newsImage" accept="image/*" required>
+        </div>
+
+        <button type="submit" class="btn-submit">Simpan Berita</button>
+      </form>
+
+      <!-- List berita admin -->
+      <div class="news-container" id="adminNewsContainer"></div>
+    </section>
+
+  </main>
+
+  <script src="js/admin.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Komunitas | SampahPedia</title>
+  <link rel="stylesheet" href="style/komunitas.css" />
+  <link rel="icon" type="image/png" href="gambar.img/favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<script src="js/auth-ui.js" defer></script>
+<body>
+
+<!-- ==== Navbar ==== -->
+<nav class="navbar">
+  <div class="left-nav">
+    <!-- Tombol hamburger -->
+    <button class="menu-btn" id="menuBtn">
+      <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Logo -->
+    <div class="logo">🌿 SampahPedia</div>
+  </div>
+
+  <!-- LOGIN / REGISTER -->
+  <ul class="nav-links" id="authButtons">
+    <li><a href="register.html">Daftar</a></li>
+    <li><a href="login.html">Masuk</a></li>
+  </ul>
+
+  <!-- USER MENU (LOGIN STATE) -->
+  <div class="nav-user hidden" id="userMenu">
+    <div class="user-trigger" id="userTrigger">
+      <span class="user-icon">👤</span>
+      <span id="userName">User</span>
+    </div>
+
+    <div class="user-dropdown hidden" id="userDropdown">
+      <a href="profile.html">Profil</a>
+      <a href="admin.html" id="adminLink" class="hidden">Admin</a>
+      <button id="btnLogout">Logout</button>
+    </div>
+  </div>
+</nav>
+
+
+  <!-- ==== Sidebar Menu ==== -->
+  <div class="sidebar" id="sidebar">
+    <button class="close-btn" id="closeBtn">✕</button>
+    <ul>
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="edukasi.html">Edukasi</a></li>
+      <li><a href="berita.html">Berita</a></li>
+      <li><a href="komunitas.html">Komunitas</a></li>
+    </ul>
+  </div>
+
+  <script src="js/sidebar.js"></script>
+
+
+  <!-- ==== Header Section ==== -->
+  <section class="community-header">
+    <h1>Komunitas SampahPedia</h1>
+    <p>Bergabunglah dengan gerakan peduli lingkungan dan wujudkan Indonesia bebas sampah 🌍</p>
+  </section>
+
+  <!-- ==== Gabung Komunitas ==== -->
+  <section class="komunitas-list">
+    <div class="komunitas-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Komunitas Hijau">
+      <h3>Komunitas Hijau Nusantara</h3>
+      <p>Berfokus pada edukasi dan pengelolaan sampah di wilayah perkotaan.</p>
+      <a href="https://chat.whatsapp.com/KjR15NVAP2ZCPTDTY25paF?mode=wwt" target="_blank" class="btn-join">Gabung</a>
+    </div>
+    <div class="komunitas-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/2906/2906274.png" alt="EcoYouth">
+      <h3>EcoYouth Indonesia</h3>
+      <p>Komunitas anak muda penggerak gaya hidup ramah lingkungan.</p>
+      <a href="https://chat.whatsapp.com/FJfov1ZO4jXGlg1bhka9ik?mode=wwt" target="_blank" class="btn-join">Gabung</a>
+    </div>
+    <div class="komunitas-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png" alt="Plastic Warrior">
+      <h3>Plastic Warrior</h3>
+      <p>Fokus daur ulang dan pengurangan penggunaan plastik sekali pakai.</p>
+      <a href="https://chat.whatsapp.com/FPwyaaLvn5aCpLDdBUGcXU?mode=wwt" target="_blank" class="btn-join">Gabung</a>
+    </div>
+  </section>
+
+  <!-- ==== Jadwal Kegiatan ==== -->
+  <section class="event-section">
+    <h2>Jadwal Kegiatan Komunitas</h2>
+
+    <div id="eventList" class="event-list"></div>
+  </section>
+
+  <!-- ========== COMMUNITY ACTION: TAMBAH JADWAL (hidden by default) ========== -->
+  <section id="communityActions" class="section-space hidden">
+    <div class="community-form-card">
+      <h2>Tambah Jadwal Kegiatan</h2>
+      <p>Isi jadwal kegiatan komunitas, bisa tambah link WhatsApp & gambar.</p>
+
+      <form id="eventForm">
+        <input type="text" id="eventTitle" placeholder="Judul kegiatan" required />
+        <input type="date" id="eventDate" required />
+        <input type="text" id="eventLocation" placeholder="Lokasi" required />
+        <textarea id="eventDesc" rows="4" placeholder="Deskripsi kegiatan" required></textarea>
+
+        <input type="text" id="eventImage" placeholder="(Opsional) Link gambar kegiatan" />
+        <input type="text" id="eventWA" placeholder="(Opsional) Link WhatsApp (contoh: https://chat.whatsapp.com/...)" />
+
+        <div class="btn-center">
+          <button type="submit" class="btn-post">Simpan Jadwal</button>
+        </div>
+        <p id="eventMsg" class="post-msg"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ========== DAFTAR KOMUNITAS (role-aware) ========== -->
+  <section class="section-space" id="requestCommunityCard">
+    <div class="request-card">
+      <h2>Ingin Menambahkan Komunitasmu?</h2>
+
+      <!-- Hint (default) -->
+      <p id="requestHint" class="request-hint">
+        Login dulu untuk mengajukan akun komunitas.
+      </p>
+
+      <!-- Tombol request -->
+      <button
+        id="btnRequestCommunity"
+        class="btn-request"
+        style="display:none;"
+      >
+        Daftar sebagai Komunitas
+      </button>
+
+      <!-- Info jika sudah community -->
+      <p
+        id="communityInfo"
+        style="text-align:center; margin-top:10px; display:none;"
+      >
+  
+      </p>
+    </div>
+  </section>
+
+
+  <!-- =====================
+      MODAL FORM KOMUNITAS
+  ===================== -->
+    <div id="communityModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Daftar Komunitas</h3>
+
+      <form id="communityForm">
+        <div>
+          <label>Nama Komunitas</label>
+          <input type="text" id="community_name" required />
+        </div>
+
+        <div>
+          <label>Kota</label>
+          <input type="text" id="city" required />
+        </div>
+
+        <div class="full">
+          <label>Deskripsi</label>
+          <textarea id="description"></textarea>
+        </div>
+
+        <div class="full">
+          <label>Kontak (WA / Email)</label>
+          <input type="text" id="contact" />
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn green">Kirim</button>
+          <button type="button" id="btnCloseModal" class="btn outline">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==== FORUM KOMUNITAS ==== -->
+  <section class="forum">
+    <h2>Forum Komunitas</h2>
+    <p>Bagikan ide, pertanyaan, atau pengalamanmu di sini.</p>
+
+    <div class="forum-container">
+
+      <!-- LIST KOMENTAR (DINAMIS + SCROLL SENDIRI) -->
+      <div id="forumList" class="comment-list">
+        <!-- komentar dari backend akan masuk di sini -->
+      </div>
+
+      <!-- FORM INPUT KOMENTAR -->
+      <form id="forumForm" class="forum-input">
+        <textarea
+          id="forumContent"
+          placeholder="Tulis komentar kamu di sini..."
+          required
+        ></textarea>
+
+        <button type="submit" class="btn green">
+          Kirim
+        </button>
+      </form>
+
+    </div>
+  </section>
+
+  <!-- ==== Tentang Kami ==== -->
+  <section class="about">
+    <!-- isi tentang kami (kalau ada) -->
+  </section>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-content">
+
+        <!-- Kolom Kiri: Brand -->
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <div class="logo-icon">S</div>
+            <div class="brand-name">Sampahpedia</div>
+          </div>
+
+          <p class="brand-description">
+            Platform Edukasi Sampah yang mudah, seru dan bisa dipraktikkan langsung
+            dalam kehidupan sehari-hari untuk Indonesia yang lebih hijau.
+          </p>
+
+          <div class="social-icons">
+            <div class="social-icon">
+              <!-- Facebook SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+
+            <div class="social-icon">
+              <!-- Instagram SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+              </svg>
+            </div>
+
+            <div class="social-icon">
+              <!-- Twitter SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom Tengah: Quick Links -->
+        <div class="footer-links">
+          <h3>Quick Links</h3>
+          <ul class="links-list">
+            <li><a href="#">Beranda</a></li>
+            <li><a href="#">Belajar</a></li>
+            <li><a href="#">Komunitas</a></li>
+            <li><a href="#">Tentang Kami</a></li>
+          </ul>
+        </div>
+
+        <!-- Kolom Kanan: Kontak -->
+        <div class="footer-contact">
+          <h3>Kontak</h3>
+          <ul class="contact-list">
+            <li>
+              <div class="contact-icon">📧</div>
+              <div class="contact-text">hello@sampahpedia.com</div>
+            </li>
+            <li>
+              <div class="contact-icon">📞</div>
+              <div class="contact-text">+62-9999-9999-9999</div>
+            </li>
+            <li>
+              <div class="contact-icon">📍</div>
+              <div class="contact-text">Bali, Indonesia</div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Divider -->
+      <div class="footer-divider"></div>
+
+      <!-- Copyright -->
+      <div class="copyright">
+        <p>
+          &copy; 2026 SampahPedia. All rights reserved.
+          Made with <span class="heart">♥</span> for our planet.
+        </p>
+        <p class="developer">Developed by Kelompok 5</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/komunitas.js" defer></script>
+
+</body>
+</html>

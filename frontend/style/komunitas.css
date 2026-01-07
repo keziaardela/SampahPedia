@@ -1,0 +1,1258 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins';
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f7fdf7;
+  color: #333;
+}
+
+/* =============================
+   NAVBAR FIX
+============================= */
+.navbar {
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 50px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+  margin-left: auto;
+}
+
+.nav-user {
+  margin-left: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+/* =============================
+   USER MENU (LOGIN STATE)
+============================= */
+.hidden {
+  display: none !important;
+}
+
+.nav-user {
+  position: relative;
+}
+
+.user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.user-icon {
+  font-size: 18px;
+}
+
+.user-dropdown {
+  position: absolute;
+  right: 0;
+  top: 120%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  min-width: 160px;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.user-dropdown a,
+.user-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.user-dropdown a:hover,
+.user-dropdown button:hover {
+  background: #f1f3f9;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+/* Menu kanan */
+nav {
+  margin-left: auto;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+nav a:hover,
+nav a.active {
+  color: #27ae60;
+}
+
+/* === Tombol Menu (hamburger) === */
+.menu-btn {
+  position: absolute;
+  left: 20px;
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.menu-btn:hover {
+  background: #27ae60;
+  transform: scale(1.05);
+}
+
+/* === Sidebar Styling === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -450px;
+  width: 230px;
+  height: 100%;
+  background-color: #f8fdf8;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  padding: 90px 35px 30px; 
+  transition: left 0.4s ease;
+  z-index: 1000;
+}
+
+/* Tombol close (X) di sidebar */
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #2E7D32;          
+  background-color: rgba(46, 125, 50, 0.1); 
+  transform: scale(1.2) rotate(10deg); 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+}
+
+/* Hilangkan bullet dan rapikan jarak */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 20px; 
+}
+
+/* Saat aktif, geser ke kanan (muncul) */
+.sidebar.active {
+  left: 0;
+}
+
+/* Link di sidebar */
+.sidebar a {
+  display: block;
+  margin-bottom: 18px; 
+  color: #2b2b2b;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.sidebar a:hover {
+  background: #eafbea;
+  border-left: 4px solid #2ecc71;
+  color: #27ae60;
+}
+
+/* === Konten utama === */
+.main-content {
+  transition: margin-left 0.3s ease;
+  padding: 50px;
+}
+
+/* Konten bergeser ketika sidebar aktif */
+.main-content.shift {
+  margin-left: 250px;
+}
+
+/* === Responsif === */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+  }
+
+  .main-content.shift {
+    margin-left: 200px;
+  }
+
+  .menu-btn {
+    font-size: 20px;
+    padding: 7px 10px;
+  }
+
+  nav ul {
+    display: none; /* sembunyikan menu kanan saat kecil */
+  }
+}
+
+/* === Header === */
+.community-header {
+  background: linear-gradient(135deg, #4CAF50, #27ae60);
+  color: white;
+  text-align: center;
+  padding: 120px 20px 90px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInHeader 1s ease forwards;
+}
+
+/* Bulet-bulet putih lembut */
+.community-header::before,
+.community-header::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  animation: floatCircle 6s ease-in-out infinite alternate;
+}
+
+.community-header::before {
+  width: 180px;
+  height: 180px;
+  top: -40px;
+  left: -60px;
+}
+
+.community-header::after {
+  width: 220px;
+  height: 220px;
+  bottom: -60px;
+  right: -40px;
+}
+
+/* Teks judul dan deskripsi */
+.community-header h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  animation: slideDown 1s ease-out forwards;
+}
+
+.community-header p {
+  font-size: 1.2rem;
+  color: #f1f1f1;
+  max-width: 700px;
+  margin: 0 auto;
+  animation: fadeInText 1.4s ease-out forwards;
+}
+
+/* ==== Animasi ==== */
+@keyframes fadeInHeader {
+  from { opacity: 0; transform: translateY(-40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInText {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatCircle {
+  from { transform: translateY(0); }
+  to { transform: translateY(25px); }
+}
+
+/* ==== Hero Komunitas ==== */
+.komunitas-hero {
+  text-align: center;
+  background: linear-gradient(135deg, #43a047, #2ecc71);
+  color: white;
+  padding: 80px 20px 60px; 
+  margin-top: 70px;
+  border-radius: 0 0 30px 30px;
+}
+
+.komunitas-hero h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.komunitas-hero p {
+  font-size: 17px;
+  opacity: 0.9;
+}
+
+/* ==== Daftar Komunitas ==== */
+.komunitas-list {
+  max-width: 1100px;
+  margin: 60px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+}
+
+.komunitas-card {
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  padding: 25px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.komunitas-card:hover {
+  transform: translateY(-6px);
+}
+
+.komunitas-card img {
+  width: 80px;
+  margin-bottom: 15px;
+}
+
+.komunitas-card h3 {
+  color: #27ae60;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.komunitas-card p {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 15px;
+  line-height: 1.6;
+}
+
+.btn-join {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.3s;
+  font-family: 'Poppins', sans-serif;
+}
+
+.btn-join:hover {
+  background: #218c54;
+  transform: translateY(-2px);
+}
+
+/* ==== Jadwal Kegiatan ==== */
+.event-section {
+  background: #ffffff;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.event-section h2 {
+  color: #27ae60;
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.event-section h2::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: #27ae60;
+  margin: 12px auto 0;
+  border-radius: 2px;
+}
+
+/* ==== Daftar event ==== */
+.event-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ==== Kotak kegiatan dengan garis samping ==== */
+.event-item {
+  width: 100%;
+  background: #f8fdf9;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  padding: 30px 40px;
+  text-align: left;
+  position: relative;
+  border: 1px solid #e2efe6;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+/* Garis hijau di sisi kiri */
+.event-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(180deg, #2ecc71, #43a047);
+  border-radius: 15px 0 0 15px;
+}
+
+/* Hover efek halus */
+.event-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+/* ==== Isi konten ==== */
+.event-date {
+  background: #27ae60;
+  color: white;
+  padding: 6px 18px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.event-title {
+  color: #2fa15d;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 5px 0 10px;
+}
+
+.event-description {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+.event-info {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: #666;
+}
+
+.event-info span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.event-info i {
+  color: #27ae60;
+  font-size: 15px;
+}
+
+/* ==== Aksi Edit & Hapus (Komunitas) ==== */
+.post-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+}
+
+/* tombol umum */
+.post-actions button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+/* tombol EDIT */
+.post-actions button:first-child {
+  background: #e8f7ee;
+  color: #27ae60;
+  border: 1px solid #27ae60;
+}
+
+.post-actions button:first-child:hover {
+  background: #27ae60;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(39,174,96,0.25);
+}
+
+/* tombol HAPUS */
+.post-actions button.danger {
+  background: #fdecea;
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+}
+
+.post-actions button.danger:hover {
+  background: #e74c3c;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(231,76,60,0.25);
+}
+
+/* ==== Forum Komunitas ==== */
+.forum {
+  text-align: center;
+  padding: 80px 40px;
+  background: #f8fdf9;
+}
+
+.forum h2 {
+  color: #27ae60;
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.forum p {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 40px;
+}
+
+/* ==== Wadah utama ==== */
+.forum-container {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+}
+
+/* ==== Daftar komentar ==== */
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* ==== Setiap komentar ==== */
+.comment {
+  background: #f4faf6;
+  border: 1px solid #dcefe2;
+  border-radius: 15px;
+  padding: 18px 20px;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.comment-header .name {
+  font-weight: 600;
+  color: #2fa15d;
+}
+
+.comment-header .time {
+  font-size: 13px;
+  color: #888;
+}
+
+.comment p {
+  color: #444;
+  line-height: 1.6;
+  font-size: 15px;
+  margin: 0;
+}
+
+/* ==== Input komentar ==== */
+.forum-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.forum-input textarea {
+  width: 100%;
+  max-width: 550px;
+  padding: 14px 18px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  font-size: 15px;
+  resize: none;
+  height: 100px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.forum-input textarea:focus {
+  outline: none;
+  border-color: #27ae60;
+  box-shadow: 0 0 6px rgba(47, 161, 93, 0.2);
+}
+
+/* Tombol kirim */
+.forum-input button {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 12px 50px;
+  border-radius: 50px; /* bentuk oval */
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.forum-input button:hover {
+  background: #218c54;
+  transform: scale(1.05);
+}
+
+/*Hidden*/
+.hidden { display: none !important; }
+.community-form-card{
+  background:#fffbea;
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  max-width:900px;
+  margin:0 auto;
+  font-family:'Poppins', sans-serif;
+}
+
+.community-form-card h2{
+  margin:0 0 6px;
+  color:#27ae60;
+}
+
+.community-form-card input,
+.community-form-card textarea{
+  width:100%;
+  margin-top:10px;
+  padding:12px 14px;
+  border:1px solid #e6e6e6;
+  border-radius:12px;
+  font-family:'Poppins', sans-serif;
+  outline:none;
+}
+
+.btn-post{
+  margin-top:12px;
+  padding:10px 18px;
+  border:none;
+  border-radius:12px;
+  background:#f4a51c;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-post:hover{
+  background:#d68c0c;
+}
+
+.btn-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.post-msg{ margin-top:10px; font-size:0.95rem; }
+.post-msg.success{ color:#27ae60; }
+.post-msg.error{ color:#c0392b; }
+
+.posts-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  gap:18px;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+.post-card{
+  background:#fff;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+.post-img{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+}
+
+.post-body{ padding:14px; }
+
+.post-meta{
+  display:flex;
+  justify-content:space-between;
+  font-size:0.8rem;
+  color:#777;
+  margin-bottom:8px;
+}
+
+.post-community{ font-weight:600; color:#27ae60; }
+.post-title{ margin:0 0 6px; font-size:1.05rem; }
+.post-content{ margin:0; color:#444; font-size:0.95rem; }
+
+.post-actions{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.btn-mini{
+  padding:8px 12px;
+  border:none;
+  border-radius:10px;
+  background:#27ae60;
+  color:#fff;
+  cursor:pointer;
+  font-weight:600;
+  font-size:0.85rem;
+}
+
+.btn-mini.danger{ background:#e74c3c; }
+
+.section-space{
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.section-title{
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.section-title h2{
+  color:#27ae60;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.section-title p{
+  color:#555;
+  font-size: 15px;
+}
+
+/* loading / empty state */
+.loading,
+.empty{
+  width:100%;
+  background:#ffffff;
+  border:1px solid #e2efe6;
+  border-radius:14px;
+  padding:16px 18px;
+  text-align:center;
+  color:#555;
+  box-shadow:0 3px 10px rgba(0,0,0,0.06);
+}
+
+/* card request komunitas */
+.request-card{
+  background:#ffffff;
+  border:1px solid #e2efe6;
+  border-radius:16px;
+  padding:22px 20px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  max-width: 900px;
+  margin: 0 auto;
+  text-align:center;
+}
+
+.request-card h2{
+  color:#27ae60;
+  font-size:22px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.request-hint{
+  color:#555;
+  font-size:15px;
+  margin-bottom:14px;
+}
+
+.btn-request{
+  display: block;
+  margin: 20px auto;
+  background: transparent;
+  color: #27ae60;
+  border: 2px solid #27ae60;
+  padding: 12px 26px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  font-family: 'Poppins', sans-serif;
+}
+
+.btn-request:hover{
+  background: #27ae60;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(39,174,96,0.22);
+}
+
+/* =========================
+   MODAL DAFTAR KOMUNITAS
+========================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9999;
+
+  /* ⬇️ PENTING */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* hidden = benar-benar disembunyikan */
+.hidden {
+  display: none !important;
+}
+
+/* Card modal */
+.modal-content {
+  background: #ffffff;
+  width: 520px;
+  max-width: 92%;
+  padding: 28px 26px;
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Judul */
+.modal-content h3 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #27ae60;
+  text-align: center;
+}
+
+/* Form grid */
+.modal-content form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+
+/* Full width */
+.modal-content .full {
+  grid-column: 1 / -1;
+}
+
+/* Label */
+.modal-content label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+}
+
+/* Input & textarea */
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+  border-color: #27ae60;
+  box-shadow: 0 0 0 3px rgba(39,174,96,0.18);
+}
+
+.modal-content textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* Action buttons */
+.modal-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Buttons */
+.modal-actions .btn {
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+/* Kirim */
+.modal-actions .btn.green {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: #fff;
+}
+
+.modal-actions .btn.green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(39,174,96,0.3);
+}
+
+/* Batal */
+.modal-actions .btn.outline {
+  background: transparent;
+  border: 2px solid #ccc;
+  color: #555;
+}
+
+.modal-actions .btn.outline:hover {
+  background: #f2f2f2;
+}
+
+.comment-list {
+  max-height: 300px;        /* tinggi forum */
+  overflow-y: auto;         /* scroll sendiri */
+  padding: 15px;
+  background: #f7fdf7;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.comment {
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.comment-header .name {
+  font-weight: 600;
+  color: #27ae60;
+}
+
+.comment-header .time {
+  font-size: 12px;
+  color: #999;
+}
+
+/* ==== Tentang Kami ==== */
+/* Footer styling */
+.footer {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+    color: #e0e1dd;
+    width: 100%;
+    padding: 60px 0 30px;
+    margin-top: auto;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+/* Kolom kiri - Brand */
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, #27ae60, #10b981);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.brand-name {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #27ae60, #10b981);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.brand-description {
+    line-height: 1.6;
+    margin-bottom: 25px;
+    color: #b8c1d1;
+    font-size: 14px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.social-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.social-icon:hover {
+    background-color: #b8c1d1;
+    transform: translateY(-3px);
+}
+
+.social-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: #e0e1dd;
+}
+
+/* Kolom tengah - Quick Links */
+.footer-links h3, 
+.footer-contact h3 {
+    color: #fff;
+    font-size: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #27ae60;
+    display: inline-block;
+}
+
+.links-list {
+    list-style: none;
+}
+
+.links-list li {
+    margin-bottom: 12px;
+}
+
+.links-list a {
+    color: #b8c1d1;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.links-list a:hover {
+    color: #27ae60;
+    padding-left: 5px;
+}
+
+.link-arrow {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+    fill: #b8c1d1;
+}
+
+/* Kolom kanan - Kontak */
+.contact-list {
+    list-style: none;
+}
+
+.contact-list li {
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.contact-icon {
+    margin-right: 12px;
+    min-width: 18px;
+    margin-top: 3px;
+}
+
+.contact-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: #b8c1d1;
+}
+
+.contact-text {
+    color: #b8c1d1;
+    line-height: 1.5;
+}
+
+/* Copyright */
+.footer-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 25px;
+}
+
+.copyright {
+    text-align: center;
+    color: #8a94a7;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.copyright p {
+    margin-bottom: 8px;
+}
+
+.copyright .heart {
+    color: #27ae60;
+}
+
+.developer {
+    font-size: 13px;
+    color: #6c7a95;
+    margin-top: 5px;
+}
+
+/* Responsiveness */
+@media (max-width: 900px) {
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .footer-brand {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .footer {
+        padding: 40px 0 20px;
+    }
+    
+    .brand-name {
+        font-size: 18px;
+    }
+}
+
+/* Demo content styling */
+.demo-title {
+    color: #0d1b2a;
+    margin-bottom: 20px;
+}
+
+.demo-text {
+    margin-bottom: 15px;
+}
+
+.demo-highlight {
+    background-color: #e9ecef;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #4361ee;
+    margin-top: 20px;
+}

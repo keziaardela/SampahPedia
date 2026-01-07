@@ -1,0 +1,497 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #f6f7fb;
+  color: #222;
+}
+
+/* =============================
+   TOPBAR
+============================= */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: #ffffff;
+  border-bottom: 1px solid #e9e9ef;
+}
+
+.brand { font-weight: 700; font-size: 18px; }
+.brand span { font-weight: 600; color: #27ae60; }
+
+.container {
+  max-width: 1100px;
+  margin: 18px auto;
+  padding: 0 16px;
+}
+
+/* =============================
+   FIX JARAK ANTAR SECTION
+============================= */
+main > section {
+  margin-bottom: 20px;
+}
+
+main > section.grid {
+  margin-bottom: 30px;
+}
+
+/* =============================
+   GRID & CARD
+============================= */
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+}
+
+h2 { margin: 6px 0 10px; font-size: 18px; }
+.muted { margin: 0 0 12px; color: #666; font-size: 13px; }
+
+/* =============================
+   FORM
+============================= */
+.form label {
+  display: block;
+  font-size: 13px;
+  margin: 10px 0 6px;
+  color: #333;
+}
+
+.form input,
+.form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e3e3ea;
+  border-radius: 10px;
+  outline: none;
+  font-size: 13px;
+}
+
+.form input:focus,
+.form textarea:focus {
+  border-color: #27ae60;
+}
+
+.row {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+/* =============================
+   BUTTON – GLOBAL (FORM / TOPBAR)
+============================= */
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn.primary {
+  background: #ffc107;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(255, 193, 7, 0.35);
+}
+.btn.primary:hover {
+  background: #ffb300;
+  transform: translateY(-1px);
+}
+
+.btn.ghost {
+  background: #f1f3f9;
+  color: #222;
+}
+.btn.ghost:hover {
+  background: #e7e9f2;
+  transform: translateY(-1px);
+}
+
+.btn.danger {
+  background: #ff4d4f;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(255, 77, 79, 0.3);
+}
+.btn.danger:hover {
+  background: #e63c3e;
+  transform: translateY(-1px);
+}
+
+.btn.sm {
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+/* =============================
+   TABLE
+============================= */
+.actions { display: flex; gap: 10px; }
+
+.tableWrap { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+  text-align: left;
+}
+
+.table th {
+  color: #444;
+  background: #fafafa;
+}
+
+.table td:last-child {
+  white-space: nowrap;
+}
+
+/* =============================
+   TABLE ACTION BUTTON (FIX UTAMA)
+============================= */
+.table td button {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 8px;
+}
+
+.table td button:last-child {
+  margin-right: 0;
+}
+
+/* Edit */
+.table td button:nth-child(1) {
+  background: #f1f3f9;
+  color: #222;
+}
+.table td button:nth-child(1):hover {
+  background: #e7e9f2;
+}
+
+/* Quiz */
+.table td button:nth-child(2) {
+  background: #ffc107;
+  color: #fff;
+}
+.table td button:nth-child(2):hover {
+  background: #ffb300;
+}
+
+/* Hapus */
+.table td button:nth-child(3) {
+  background: #ff4d4f;
+  color: #fff;
+}
+.table td button:nth-child(3):hover {
+  background: #e63c3e;
+}
+
+/* =============================
+   BADGE
+============================= */
+.badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.badge.pending { background: #ffeaa7; color:#6b4d00; }
+.badge.approved { background: #55efc4; color:#0b5d3a; }
+.badge.rejected { background: #fab1a0; color:#7a1b12; }
+
+/* =============================
+   QUIZ BUILDER
+============================= */
+.qbox {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+  background: #fafafa;
+}
+
+.qtitle {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.optRow {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.optRow input[type="text"] {
+  margin: 0;
+}
+
+/* =============================
+   ADMIN KELOLA BERITA
+============================= */
+.admin-news-section {
+  max-width: 900px;
+  margin: 120px auto 60px; /* aman dari navbar fixed */
+  background: #ffffff;
+  padding: 40px 45px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  animation: fadeInAdmin 0.6s ease forwards;
+}
+
+.admin-news-section h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #1e8449;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* ===== Form Group ===== */
+.admin-news-section .form-group {
+  margin-bottom: 22px;
+}
+
+.admin-news-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #145a32;
+  font-size: 0.95rem;
+}
+
+/* ===== Input & Textarea ===== */
+.admin-news-section input[type="text"],
+.admin-news-section textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1.8px solid #d5f2dd;
+  font-size: 0.95rem;
+  font-family: 'Poppins', sans-serif;
+  outline: none;
+  transition: all 0.25s ease;
+  background-color: #f9fdf9;
+}
+
+.admin-news-section textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+/* Focus effect */
+.admin-news-section input:focus,
+.admin-news-section textarea:focus {
+  border-color: #27ae60;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
+}
+
+/* ===== File Input ===== */
+.admin-news-section input[type="file"] {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1.5px dashed #27ae60;
+  background: #f4fff7;
+  cursor: pointer;
+}
+
+/* ===== Button ===== */
+.admin-news-section .btn-submit {
+  margin-top: 25px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 18px rgba(39, 174, 96, 0.35);
+}
+
+.admin-news-section .btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(39, 174, 96, 0.45);
+}
+
+.btn-delete {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-delete:hover {
+  background: #c0392b;
+}
+
+/* ===== Animation ===== */
+@keyframes fadeInAdmin {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .admin-news-section {
+    padding: 30px 25px;
+    margin: 100px 15px 40px;
+  }
+
+  .admin-news-section h2 {
+    font-size: 1.6rem;
+  }
+}
+
+/* === Admin News Card  === */
+/* Container admin berita (GRID 3 kolom) */
+#adminNewsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+  justify-items: center;
+  margin-top: 40px;
+}
+
+.admin-news-card {
+  background: #fff;
+  max-width: 360px;      
+  margin: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.admin-news-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.admin-news-card img {
+  width: 100%;
+  height: 220px;     
+  object-fit: cover;
+}
+
+.admin-news-content {
+  padding: 15px 16px 20px;
+  text-align: center;
+}
+
+.admin-news-content h3 {
+  font-size: 1.05rem;
+  color: #104a1e;
+  margin-bottom: 10px;
+}
+
+.admin-news-content p {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.admin-news-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.admin-news-actions button {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  border-radius: 20px;
+}
+
+.admin-news-actions button:hover {
+  background: #c0392b;
+}
+
+.admin-news-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-edit {
+  background: #f39c12;
+  color: white;
+  border: none;
+  padding: 7px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-edit:hover {
+  background: #d68910;
+}
+
+.btn-delete {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 7px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-delete:hover {
+  background: #c0392b;
+}
