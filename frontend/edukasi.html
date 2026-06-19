@@ -59,6 +59,7 @@
 
   <script src="js/sidebar.js"></script>
 
+
   <main>
     <!-- HEADER EDUKASI -->
     <section class="edukasi-header">
@@ -183,6 +184,55 @@
       </div>
     </div>
   </main>
+
+  <!-- AI ASSISTANT -->
+<section class="ai-section">
+  <div class="ai-container">
+
+    <div class="ai-header">
+      <h2>🤖 AI Asisten SampahPedia</h2>
+      <p>
+        Tanyakan apa saja tentang sampah, daur ulang,
+        lingkungan, dan pengelolaan limbah.
+      </p>
+    </div>
+    
+<div class="quick-questions">
+
+  <button onclick="setQuestion('Apa itu sampah organik?')">
+    Sampah Organik
+  </button>
+
+  <button onclick="setQuestion('Bagaimana cara daur ulang plastik?')">
+    Daur Ulang Plastik
+  </button>
+
+  <button onclick="setQuestion('Apa manfaat bank sampah?')">
+    Bank Sampah
+  </button>
+
+</div>
+
+    <div id="chatBox" class="chat-box">
+      <div class="bot-message">
+        Halo 👋 Saya AI SampahPedia. Ada yang ingin kamu tanyakan?
+      </div>
+    </div>
+
+    <div class="chat-input">
+      <input
+        type="text"
+        id="question"
+        placeholder="Contoh: Apa itu sampah organik?"
+      >
+
+      <button onclick="askAI()">
+        Kirim
+      </button>
+    </div>
+
+  </div>
+</section>
 
   <!-- ==== Tentang Kami ==== -->
   <section class="about">

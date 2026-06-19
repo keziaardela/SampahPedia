@@ -1,3 +1,5 @@
+require("dotenv").config();
+const Groq = require("groq-sdk");
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -5,6 +7,11 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const path = require("path");
 const multer = require("multer");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
+});
 
 
 const app = express();
@@ -1143,7 +1150,84 @@ app.delete("/api/news/:id", async (req, res) => {
 
 // TEST
 app.get("/api/test", (req, res) => {
-  res.json({ ok: true });
+  res.json({
+    ok: true,
+    gemini: "aktif"
+  });
+});
+
+
+app.get("/gemini-test", async (req, res) => {
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash"
+  });
+
+  const result = await model.generateContent(
+    "Apa itu sampah organik?"
+  );
+
+  res.send(result.response.text());
+
+});
+
+
+app.post("/api/ask-ai", async (req, res) => {
+  try {
+
+    const { question } = req.body;
+
+    if (!question || question.trim() === "") {
+      return res.status(400).json({
+        message: "Pertanyaan tidak boleh kosong"
+      });
+    }
+
+    const chatCompletion =
+      await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `
+Kamu adalah AI Asisten SampahPedia.
+
+Aturan:
+- Jawab dalam Bahasa Indonesia.
+- Maksimal 5 poin.
+- Gunakan format HTML.
+- Jika membuat daftar gunakan tag <ul> dan <li>.
+- Jangan gunakan tanda *.
+- Jawaban singkat dan rapi.
+`
+          },
+          {
+            role: "user",
+            content: question
+          }
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.5,
+        max_tokens: 500
+      });
+
+    const answer =
+      chatCompletion.choices[0].message.content;
+
+    res.json({
+      success: true,
+      answer
+    });
+
+  } catch (error) {
+
+    console.error("GROQ ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Gagal mendapatkan jawaban AI"
+    });
+
+  }
 });
 
 // STATIC

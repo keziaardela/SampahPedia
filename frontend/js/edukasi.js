@@ -271,3 +271,96 @@ document.addEventListener("DOMContentLoaded", () => {
   loadModules();
   loadProgress();
 });
+
+/* =======================
+   AI CHATBOT
+======================= */
+
+async function askAI() {
+
+  const question =
+    document.getElementById("question").value.trim();
+
+  if (!question) return;
+
+  const chatBox =
+    document.getElementById("chatBox");
+
+  // tampilkan pesan user
+const time = new Date().toLocaleTimeString([], {
+  hour: "2-digit",
+  minute: "2-digit"
+});
+
+chatBox.innerHTML += `
+  <div class="user-message">
+    <div>${question}</div>
+    <small>${time}</small>
+  </div>
+`;
+
+  // loading
+  chatBox.innerHTML += `
+    <div class="bot-message" id="loading">
+      🤖 Sedang mencari jawaban...
+    </div>
+  `;
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  document.getElementById("question").value = "";
+
+  try {
+
+    const res = await fetch(
+      "http://localhost:3000/api/ask-ai",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          question
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    document.getElementById("loading")?.remove();
+
+    chatBox.innerHTML += `
+  <div class="bot-message">
+    <div>🤖 ${data.answer}</div>
+    <small>${time}</small>
+  </div>
+`;
+
+  } catch (err) {
+
+    document.getElementById("loading")?.remove();
+
+    chatBox.innerHTML += `
+      <div class="bot-message">
+        ❌ Gagal terhubung ke AI
+      </div>
+    `;
+  }
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function setQuestion(text){
+  document.getElementById("question").value = text;
+}
+
+window.setQuestion = setQuestion;
+
+function setQuestion(text){
+    document.getElementById("question").value = text;
+}
+
+window.setQuestion = setQuestion;
+
+window.askAI = askAI;
+
