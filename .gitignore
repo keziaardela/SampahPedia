@@ -1,0 +1,14 @@
+# Mengabaikan folder node_modules (isinya terlalu berat)
+node_modules/
+
+# Mengabaikan file konfigurasi rahasia API Key
+.env
+backend/.env
+
+# Mengabaikan folder uploads tempat menyimpan foto sementara
+backend/uploads/
+uploads/
+
+# Mengabaikan file log sistem
+.DS_Store
+*.log

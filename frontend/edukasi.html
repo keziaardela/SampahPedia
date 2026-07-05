@@ -219,14 +219,32 @@
       </div>
     </div>
 
-    <div class="chat-input">
+    <div class="chat-input" style="display: flex; align-items: center; gap: 8px;">
+      <input 
+        type="file" 
+        id="cameraInput" 
+        accept="image/*" 
+        capture="environment" 
+        style="display: none;" 
+        onchange="uploadCameraImage()"
+      >
+      
+      <button 
+        onclick="document.getElementById('cameraInput').click()" 
+        style="background: #34495e; padding: 10px 12px; width: auto;" 
+        title="Ambil Foto Sampah"
+      >
+        📷
+      </button>
+
       <input
         type="text"
         id="question"
         placeholder="Contoh: Apa itu sampah organik?"
+        style="flex: 1;"
       >
 
-      <button onclick="askAI()">
+      <button onclick="askAI()" style="width: auto; padding: 10px 20px;">
         Kirim
       </button>
     </div>

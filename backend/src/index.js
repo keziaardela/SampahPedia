@@ -9,10 +9,20 @@ const path = require("path");
 const multer = require("multer");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
-});
+let groq = null;
 
+if (process.env.GROQ_API_KEY) {
+  groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY
+  });
+}
+
+// Inisialisasi Gemini AI
+let genAI = null;
+
+if (process.env.GEMINI_API_KEY) {
+  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+}
 
 const app = express();
 console.log("🔥 SERVER FILE: src/index.js AKTIF");
@@ -22,7 +32,8 @@ const port = 3000;
    MIDDLEWARE
 ====================== */
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ limit: "20mb", extended: true }));
 
 
 /* ======================
@@ -1080,6 +1091,105 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+app.post("/api/scan-sampah", upload.single("image"), async (req, res) => {
+  try {
+    if (!genAI) {
+      return res.status(503).json({ success: false, message: "Gemini AI belum dikonfigurasi" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Gambar wajib diunggah" });
+    }
+
+    // Amankan pengambilan teks pertanyaan agar tidak memicu undefined error
+    const userQuestion = req.body.question ? String(req.body.question).trim() : "";
+
+    const fs = require("fs");
+    const fileToGenerativePart = (file) => {
+      return {
+        inlineData: {
+          data: Buffer.from(fs.readFileSync(file.path)).toString("base64"),
+          mimeType: file.mimetype
+        },
+      };
+    };
+
+    const imagePart = fileToGenerativePart(req.file);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    let prompt = "";
+    if (userQuestion !== "") {
+      prompt = `
+        Analisis gambar sampah yang dilampirkan dan jawab pertanyaan pengguna berikut: "${userQuestion}"
+        
+        Aturan format jawaban:
+        - Jawab dalam Bahasa Indonesia yang ramah.
+        - Gunakan format HTML langsung (tag <ul>, <li>, atau <p> jika perlu).
+        - JANGAN PERNAH membungkus dengan tanda backtick markdown seperti \`\`\`html.
+        - Jawaban singkat, padat, dan sangat relevan dengan pengelolaan sampah/lingkungan.
+      `;
+    } else {
+      prompt = `
+        Analisis gambar sampah ini dan berikan informasi berikut dalam Bahasa Indonesia:
+        1. Apa nama benda/sampah ini?
+        2. Apa kategori jenis sampahnya? (Organik, Anorganik, atau B3)
+        3. Bagaimana cara membuang atau mendaur ulangnya dengan benar?
+        
+        Aturan format jawaban:
+        - Gunakan format HTML langsung (gunakan tag <ul> dan <li> untuk daftar).
+        - JANGAN PERNAH membungkus dengan tanda backtick markdown seperti \`\`\`html.
+        - Maksimal 4 poin singkat.
+      `;
+    }
+
+    const result = await model.generateContent([prompt, imagePart]);
+    let responseText = result.response.text();
+
+    // Hapus file fisik sementara dari folder uploads
+    try {
+      if (fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+    } catch (fsError) {
+      console.error("⚠️ Gagal menghapus file sementara:", fsError.message);
+    }
+
+    responseText = responseText.replace(/```html/g, "").replace(/```/g, "").trim();
+
+    // SIMPAN KE DATABASE DENGAN TRY-CATCH AMAN
+    try {
+      const activeSession = req.body.sessionId ? String(req.body.sessionId) : "default-session";
+      const userText = userQuestion !== "" ? userQuestion : "[User mengirim foto sampah untuk dianalisis]";
+
+      await query(
+        "INSERT INTO chat_histories (session_id, role, content) VALUES (?, 'user', ?)", 
+        [activeSession, userText]
+      );
+      await query(
+        "INSERT INTO chat_histories (session_id, role, content) VALUES (?, 'model', ?)", 
+        [activeSession, String(responseText)]
+      );
+      
+      console.log("✅ Berhasil merekam riwayat scan ke database untuk sesi:", activeSession);
+    } catch (dbError) {
+      // Jika database gagal, cetak error di log VS Code tetapi JANGAN gagalkan kiriman response ke user
+      console.error("⚠️ DATABASE ERROR SAAT SCAN GAMBAR:", dbError.message);
+    }
+
+    return res.json({
+      success: true,
+      answer: responseText
+    });
+
+  } catch (error) {
+    console.error("🔥 GEMINI MULTIMODAL SCAN ERROR:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Gagal memproses analisis gambar di server. Periksa ukuran file gambar Anda." 
+    });
+  }
+});
+
 /* ======================
    BERITA KEGIATAN
 ====================== */
@@ -1158,75 +1268,106 @@ app.get("/api/test", (req, res) => {
 
 
 app.get("/gemini-test", async (req, res) => {
-
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash"
-  });
-
-  const result = await model.generateContent(
-    "Apa itu sampah organik?"
-  );
-
-  res.send(result.response.text());
-
-});
-
-
-app.post("/api/ask-ai", async (req, res) => {
   try {
-
-    const { question } = req.body;
-
-    if (!question || question.trim() === "") {
-      return res.status(400).json({
-        message: "Pertanyaan tidak boleh kosong"
+    if (!genAI) {
+      return res.status(503).json({
+        success: false,
+        message: "Gemini AI belum dikonfigurasi di file .env"
       });
     }
 
-    const chatCompletion =
-      await groq.chat.completions.create({
-        messages: [
-          {
-            role: "system",
-            content: `
-Kamu adalah AI Asisten SampahPedia.
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash"
+    });
 
-Aturan:
-- Jawab dalam Bahasa Indonesia.
-- Maksimal 5 poin.
-- Gunakan format HTML.
-- Jika membuat daftar gunakan tag <ul> dan <li>.
-- Jangan gunakan tanda *.
-- Jawaban singkat dan rapi.
+    const result = await model.generateContent("Apa itu sampah organik?");
+    res.send(result.response.text());
+
+  } catch (error) {
+    console.error("GEMINI ERROR:", error);
+    res.status(500).send("Gagal mengambil data dari Gemini AI");
+  }
+});
+
+app.post("/api/ask-ai", async (req, res) => {
+  try {
+    if (!groq) {
+      return res.status(503).json({ success: false, message: "AI belum dikonfigurasi." });
+    }
+
+    const { question, sessionId } = req.body;
+    const activeSession = sessionId ? String(sessionId) : "default-session";
+
+    if (!question || question.trim() === "") {
+      return res.status(400).json({ success: false, message: "Pertanyaan tidak boleh kosong" });
+    }
+
+    // 1. Ambil riwayat chat sebelumnya dari database
+    let historyRows = [];
+    try {
+      historyRows = await query(
+        "SELECT role, content FROM chat_histories WHERE session_id = ? ORDER BY created_at ASC LIMIT 20",
+        [activeSession]
+      );
+    } catch (dbError) {
+      console.error("⚠️ Gagal membaca tabel chat_histories:", dbError.message);
+    }
+
+    // 2. Susun instruksi dasar untuk AI (Groq) agar peka terhadap konteks gambar dari database
+    const messages = [
+      {
+        role: "system",
+        content: `
+Kamu adalah AI Asisten SampahPedia yang cerdas dan ramah.
+Tugas utama kamu adalah membantu menjawab pertanyaan seputar pengelolaan sampah, daur ulang, dan lingkungan.
+
+ATURAN UTAMA PERCAKAPAN (WAJIB DIIKUTI):
+- Jawab dalam Bahasa Indonesia yang rapi. Gunakan format HTML langsung (seperti <ul> dan <li> jika berupa daftar). JANGAN PERNAH gunakan tanda bintang (*) atau membungkus jawaban dengan \`\`\`html.
+- BACA RIWAYAT OBROLAN DENGAN TELITI. Jika pada riwayat obrolan sebelumnya pengguna mengirim foto sampah dan asisten (model) sudah menganalisis isinya (misalnya menyebutkan ada kaleng aluminium, botol plastik, sampah anorganik, dll), maka ketika pengguna bertanya "Cara mengolahnya?", "Bagaimana mengolah masing-masing?", atau pertanyaan lanjutan lainnya, kamu HARUS MENJAWAB SPESIFIK tentang cara mengolah jenis-jenis sampah yang ada di dalam hasil analisis foto terakhir tersebut.
+- Jangan pernah mengatakan "Saya tidak bisa melihat foto" atau "Silakan kirim foto", karena detail isi fotonya sudah dituliskan secara teks oleh asisten di riwayat chat sebelumnya. Cukup gunakan data teks analisis tersebut untuk menjawab pertanyaan pengguna saat ini.
 `
-          },
-          {
-            role: "user",
-            content: question
-          }
-        ],
-        model: "llama-3.3-70b-versatile",
-        temperature: 0.5,
-        max_tokens: 500
+      }
+    ];
+
+    // 3. Masukkan riwayat obrolan dari database ke memori Groq
+    if (historyRows && historyRows.length > 0) {
+      historyRows.forEach(row => {
+        messages.push({
+          role: row.role === 'model' ? 'assistant' : 'user',
+          content: row.content
+        });
       });
+    }
 
-    const answer =
-      chatCompletion.choices[0].message.content;
+    // 4. Masukkan pertanyaan baru dari pengguna
+    messages.push({ role: "user", content: question });
 
-    res.json({
+    // 5. Panggil Groq API
+    const chatCompletion = await groq.chat.completions.create({
+      messages: messages,
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.3, // Diturunkan agar AI lebih patuh pada perintah sistem dan riwayat
+      max_tokens: 600
+    });
+
+    const answer = chatCompletion.choices[0].message.content;
+
+    // 6. Simpan obrolan baru ini ke database agar memori berlanjut
+    try {
+      await query("INSERT INTO chat_histories (session_id, role, content) VALUES (?, 'user', ?)", [activeSession, question]);
+      await query("INSERT INTO chat_histories (session_id, role, content) VALUES (?, 'model', ?)", [activeSession, answer]);
+    } catch (insertError) {
+      console.error("⚠️ Gagal menyimpan ke database:", insertError.message);
+    }
+
+    return res.json({
       success: true,
-      answer
+      answer: answer
     });
 
   } catch (error) {
-
-    console.error("GROQ ERROR:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Gagal mendapatkan jawaban AI"
-    });
-
+    console.error("🔥 GROQ CHAT GLOBAL ERROR:", error);
+    return res.status(500).json({ success: false, message: "Gagal memproses obrolan di server" });
   }
 });
 

@@ -276,79 +276,69 @@ document.addEventListener("DOMContentLoaded", () => {
    AI CHATBOT
 ======================= */
 
-async function askAI() {
+const chatSessionId = 'session-' + Date.now();
 
-  const question =
-    document.getElementById("question").value.trim();
+window.askAI = async function () {
+  const questionInput = document.getElementById("question");
+  const question = questionInput.value.trim();
 
   if (!question) return;
 
-  const chatBox =
-    document.getElementById("chatBox");
+  const chatBox = document.getElementById("chatBox");
 
-  // tampilkan pesan user
-const time = new Date().toLocaleTimeString([], {
-  hour: "2-digit",
-  minute: "2-digit"
-});
-
-chatBox.innerHTML += `
-  <div class="user-message">
-    <div>${question}</div>
-    <small>${time}</small>
-  </div>
-`;
-
-  // loading
+  // 1. Tampilkan pesan user ke dalam chatBox secara lokal terlebih dahulu
   chatBox.innerHTML += `
-    <div class="bot-message" id="loading">
-      🤖 Sedang mencari jawaban...
+    <div class="user-message">
+      ${question}
     </div>
   `;
-
+  
+  // Kosongkan kolom input teks setelah tombol kirim ditekan
+  questionInput.value = "";
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  document.getElementById("question").value = "";
+  // 2. Tampilkan indikator loading dari Bot
+  const botLoadingId = "bot-loading-" + Date.now();
+  chatBox.innerHTML += `
+    <div class="bot-message" id="${botLoadingId}">
+      ⏳ Menunggu tanggapan asisten...
+    </div>
+  `;
+  chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
+    // 3. Kirim data ke backend dengan menyertakan 'chatSessionId'
+    const response = await fetch(`${API}/api/ask-ai`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        question: question,
+        sessionId: chatSessionId // 💡 Mengirimkan ID Sesi agar backend bisa membaca riwayat chat dari DB
+      })
+    });
 
-    const res = await fetch(
-      "http://localhost:3000/api/ask-ai",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          question
-        })
-      }
-    );
+    const data = await response.json();
+    const botLoadingElement = document.getElementById(botLoadingId);
 
-    const data = await res.json();
-
-    document.getElementById("loading")?.remove();
-
-    chatBox.innerHTML += `
-  <div class="bot-message">
-    <div>🤖 ${data.answer}</div>
-    <small>${time}</small>
-  </div>
-`;
-
-  } catch (err) {
-
-    document.getElementById("loading")?.remove();
-
-    chatBox.innerHTML += `
-      <div class="bot-message">
-        ❌ Gagal terhubung ke AI
-      </div>
-    `;
+    if (data.success) {
+      // Ganti indikator loading dengan jawaban asli dari AI
+      botLoadingElement.innerHTML = `🤖 ${data.answer}`;
+    } else {
+      botLoadingElement.innerText = `❌ Gagal: ${data.message || "Terjadi kesalahan pada AI"}`;
+    }
+  } catch (error) {
+    console.error("Error pada askAI Frontend:", error);
+    const botLoadingElement = document.getElementById(botLoadingId);
+    if (botLoadingElement) {
+      botLoadingElement.innerText = "❌ Hubungan ke server terputus atau server error.";
+    }
+  } finally {
+    // Pastikan chat otomatis bergulir ke posisi paling bawah setelah teks muncul
+    chatBox.scrollTop = chatBox.scrollHeight;
   }
-
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+};
 
 function setQuestion(text){
   document.getElementById("question").value = text;
@@ -364,3 +354,86 @@ window.setQuestion = setQuestion;
 
 window.askAI = askAI;
 
+async function uploadCameraImage() {
+    const fileInput = document.getElementById('cameraInput');
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const questionInput = document.getElementById('question');
+    const userQuestion = questionInput.value.trim();
+    const chatBox = document.getElementById('chatBox');
+
+    // 1. Buat ID unik untuk pesan user dan loading bot
+    const userMsgId = 'msg-' + Date.now();
+    const botLoadingId = 'bot-' + Date.now();
+
+    // 2. Gunakan FileReader untuk membaca gambar dan menampilkan preview di Chat
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // Buat struktur pesan user yang berisi gambar kecil dan teks pertanyaan
+        let userMessageHtml = `
+            <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                <img src="${e.target.result}" style="max-width: 120px; max-height: 120px; border-radius: 8px; object-fit: cover; border: 1px solid #ddd;" alt="Sampah">
+        `;
+        
+        if (userQuestion) {
+            userMessageHtml += `<span style="margin-top: 5px;">💬 <b>Pertanyaan:</b> ${userQuestion}</span>`;
+        } else {
+            userMessageHtml += `<i style="font-size: 12px; color: #7f8c8d;">🖼️ Mengirim foto sampah...</i>`;
+        }
+        
+        userMessageHtml += `</div>`;
+
+        // Masukkan pesan user ke dalam chatBox
+        chatBox.innerHTML += `<div class="user-message" id="${userMsgId}">${userMessageHtml}</div>`;
+        
+        // Langsung tampilkan animasi loading di bawah pesan user
+        chatBox.innerHTML += `
+            <div class="bot-message" id="${botLoadingId}">
+                ⏳ Gemini sedang menganalisis foto dan pertanyaanmu...
+            </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    };
+    
+    // Mulai membaca file gambar untuk dijadikan preview URL (Base64)
+    reader.readAsDataURL(file);
+
+    // 3. Siapkan FormData untuk dikirim ke backend
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('question', userQuestion);
+    formData.append('sessionId', String(chatSessionId));
+
+    // Kosongkan input teks segera setelah tombol ditekan
+    questionInput.value = "";
+
+    try {
+        // 4. Lakukan fetch ke backend (tunggu proses FileReader selesai di latar belakang)
+        const response = await fetch('http://localhost:3000/api/scan-sampah', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        const botMessageElement = document.getElementById(botLoadingId);
+        
+        if (data.success) {
+            botMessageElement.innerHTML = `🤖 <b>Tanggapan AI:</b><br>${data.answer}`;
+        } else {
+            botMessageElement.innerText = `❌ Gagal: ${data.message}`;
+        }
+    } catch (error) {
+        console.error(error);
+        const botMessageElement = document.getElementById(botLoadingId);
+        if (botMessageElement) {
+            botMessageElement.innerText = "❌ Terjadi kesalahan saat menyambung ke server.";
+        }
+    } finally {
+        fileInput.value = "";
+        // Pastikan posisi chat otomatis scroll ke paling bawah setelah jawaban muncul
+        setTimeout(() => {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 100);
+    }
+}
