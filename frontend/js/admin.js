@@ -64,6 +64,10 @@ const btnResetModule = document.getElementById("btnResetModule");
 const quizModuleInfo = document.getElementById("quizModuleInfo");
 const quizTitle = document.getElementById("quizTitle");
 const quizBuilder = document.getElementById("quizBuilder");
+
+const btnGenerateAI = document.getElementById("btnGenerateAI");
+const aiQuizStatus = document.getElementById("aiQuizStatus");
+
 const btnSaveQuiz = document.getElementById("btnSaveQuiz");
 const btnDeleteQuiz = document.getElementById("btnDeleteQuiz");
 
@@ -106,6 +110,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (btnDeleteQuiz) {
     btnDeleteQuiz.addEventListener("click", deleteQuiz);
+  }
+
+  if (btnGenerateAI) {
+    btnGenerateAI.addEventListener("click", generateQuizWithAI);
   }
 
   loadModules();
@@ -255,30 +263,161 @@ function buildQuizForm() {
 
 function resetQuizPanel() {
   selectedModuleId = null;
+
   quizModuleInfo.value = "Belum dipilih";
   quizTitle.value = "";
   quizBuilder.innerHTML = "";
+
   btnSaveQuiz.disabled = true;
   btnDeleteQuiz.disabled = true;
+
+  if (btnGenerateAI) {
+    btnGenerateAI.disabled = true;
+  }
+
+  if (aiQuizStatus) {
+    aiQuizStatus.style.display = "none";
+    aiQuizStatus.textContent = "";
+  }
 }
 
 async function selectModuleForQuiz(id, title) {
   selectedModuleId = id;
+
   quizModuleInfo.value = `#${id} - ${title}`;
+
   btnSaveQuiz.disabled = false;
   btnDeleteQuiz.disabled = false;
+
+  if (btnGenerateAI) {
+    btnGenerateAI.disabled = false;
+  }
+
   buildQuizForm();
 
-  const res = await fetch(`${API}/api/admin/modules/${id}/quiz`, {
-    headers: getAuthHeaders()
-  });
+  try {
+    const res = await fetch(
+      `${API}/api/admin/modules/${id}/quiz`,
+      {
+        headers: getAuthHeaders()
+      }
+    );
 
-  if (res.ok) {
-    const q = await res.json();
-    quizTitle.value = q.title || "";
-  } else {
+    if (res.ok) {
+      const q = await res.json();
+
+      quizTitle.value =
+        q.title || `Quiz ${title}`;
+
+    } else {
+      quizTitle.value = `Quiz ${title}`;
+    }
+
+  } catch (err) {
+    console.error("Load quiz error:", err);
     quizTitle.value = `Quiz ${title}`;
   }
+}
+
+async function generateQuizWithAI() {
+  if (!selectedModuleId) {
+    alert("Pilih modul terlebih dahulu");
+    return;
+  }
+
+  btnGenerateAI.disabled = true;
+  btnGenerateAI.textContent = "⏳ AI sedang membuat soal...";
+
+  if (aiQuizStatus) {
+    aiQuizStatus.style.display = "block";
+    aiQuizStatus.textContent =
+      "AI sedang membaca materi dan membuat 3 soal...";
+  }
+
+  try {
+    const res = await fetch(
+      `${API}/api/admin/modules/${selectedModuleId}/generate-quiz`,
+      {
+        method: "POST",
+        headers: getAuthHeaders()
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(
+        data.message || "Gagal generate quiz"
+      );
+    }
+
+    fillQuizFromAI(data);
+
+    if (aiQuizStatus) {
+      aiQuizStatus.textContent =
+        "Quiz berhasil dibuat oleh AI. Silakan periksa dan edit sebelum disimpan.";
+    }
+
+  } catch (err) {
+    console.error("Generate AI error:", err);
+
+    alert(err.message || "Gagal generate quiz dengan AI");
+
+    if (aiQuizStatus) {
+      aiQuizStatus.textContent =
+        "Generate quiz gagal.";
+    }
+
+  } finally {
+    btnGenerateAI.disabled = false;
+    btnGenerateAI.textContent =
+      "✨ Generate Quiz dengan AI";
+  }
+}
+
+function fillQuizFromAI(data) {
+  if (data.title) {
+    quizTitle.value = data.title;
+  }
+
+  if (!Array.isArray(data.questions)) {
+    alert("Format quiz dari AI tidak valid");
+    return;
+  }
+
+  const qBoxes =
+    document.querySelectorAll("#quizBuilder .qbox");
+
+  data.questions.slice(0, 3).forEach((q, index) => {
+    const box = qBoxes[index];
+
+    if (!box) return;
+
+    // isi pertanyaan
+    const qText = box.querySelector(".qText");
+    qText.value = q.question || "";
+
+    // isi pilihan jawaban
+    const optionInputs =
+      box.querySelectorAll(".optText");
+
+    q.options.slice(0, 4).forEach((opt, optIndex) => {
+      if (!optionInputs[optIndex]) return;
+
+      optionInputs[optIndex].value =
+        opt.text || "";
+
+      if (opt.is_correct) {
+        const radio = box.querySelector(
+          `input[type="radio"][value="${optIndex + 1}"]`
+        );
+
+        if (radio) {
+          radio.checked = true;
+        }
+      }
+    });
+  });
 }
 
 async function saveQuiz() {
