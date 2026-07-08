@@ -1,13 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   const newsContainer = document.getElementById("newsContainer");
 
+  // Safety check
   if (!newsContainer) {
-    console.error("newsContainer tidak ditemukan");
+    console.error("newsContainer tidak ditemukan di HTML");
     return;
   }
 
-  // Ambil berita dari localStorage (hasil input admin)
-  const newsData = JSON.parse(localStorage.getItem("newsData")) || [];
+  // Data berita (masih kosong)
+  const newsData = [];
 
   renderNews();
 
@@ -24,13 +25,13 @@ document.addEventListener("DOMContentLoaded", () => {
           color:#666;
           font-size:1rem;
         ">
-          Belum ada berita kegiatan yang ditampilkan.
+          <p>Belum ada berita kegiatan yang ditampilkan.</p>
         </div>
       `;
       return;
     }
 
-    // Render berita
+    // Kalau nanti sudah ada data
     newsData.forEach(item => {
       const card = document.createElement("div");
       card.className = "news-card";

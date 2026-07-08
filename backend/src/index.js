@@ -1371,9 +1371,41 @@ ATURAN UTAMA PERCAKAPAN (WAJIB DIIKUTI):
   }
 });
 
+/* ======================
+   BANK SAMPAH
+====================== */
+
+// Ambil semua lokasi bank sampah
+app.get("/api/bank-sampah", async (req, res) => {
+  try {
+    const rows = await query(`
+      SELECT
+        id,
+        nama,
+        alamat,
+        latitude,
+        longitude,
+        no_telp,
+        jam_operasional
+      FROM bank_sampah
+      ORDER BY nama ASC
+    `);
+
+    res.json(rows);
+
+  } catch (err) {
+    console.error("GET BANK SAMPAH ERROR:", err);
+
+    res.status(500).json({
+      message: "Server error",
+      error: err.message
+    });
+  }
+});
+
 // STATIC
 app.use(express.static(path.join(__dirname, "../../frontend")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // LISTEN
 app.listen(port, () => {
