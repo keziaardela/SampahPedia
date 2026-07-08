@@ -92,12 +92,14 @@
       <!-- RIGHT: QUIZ FORM -->
       <div class="card">
         <h2>Kelola Quiz (3 soal)</h2>
+
         <p class="muted">
-          Pilih modul dari daftar, lalu isi quiz.
-          Jawaban benar pilih satu (radio).
+          Pilih modul dari daftar, lalu isi quiz secara manual
+          atau generate otomatis menggunakan AI.
         </p>
 
         <div class="form">
+
           <label>Modul dipilih</label>
           <input
             id="quizModuleInfo"
@@ -113,6 +115,23 @@
             placeholder="Quiz Modul ..."
           />
 
+          <!-- TOMBOL GENERATE AI -->
+          <button
+            class="btn ai"
+            id="btnGenerateAI"
+            type="button"
+            disabled>
+            ✨ Generate Quiz dengan AI
+          </button>
+
+          <!-- STATUS GENERATE -->
+          <p
+            id="aiQuizStatus"
+            class="muted"
+            style="display:none;">
+          </p>
+
+          <!-- FORM 3 SOAL -->
           <div id="quizBuilder"></div>
 
           <div class="row">
@@ -123,6 +142,7 @@
               disabled>
               Simpan Quiz
             </button>
+
             <button
               class="btn danger"
               id="btnDeleteQuiz"
@@ -131,10 +151,9 @@
               Hapus Quiz
             </button>
           </div>
+
         </div>
       </div>
-
-    </section>
 
     <!-- =============================
          MODULE LIST

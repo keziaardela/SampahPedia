@@ -383,131 +383,510 @@ app.delete("/api/admin/modules/:id", verifyToken, requireAdmin, async (req, res)
 
 
 /* =========================
-   ADMIN - QUIZ (CRUD)
+   ADMIN - QUIZ (CRUD + AI)
 ========================= */
 
-// ambil quiz by module (admin)
-app.get("/api/admin/modules/:moduleId/quiz", verifyToken, requireAdmin, async (req, res) => {
-  const { moduleId } = req.params;
+/* =========================
+   GENERATE QUIZ DENGAN AI
+========================= */
+app.post(
+  "/api/admin/modules/:moduleId/generate-quiz",
+  verifyToken,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      // Pastikan Groq sudah aktif dari .env
+      if (!groq) {
+        return res.status(503).json({
+          message: "Groq AI belum dikonfigurasi"
+        });
+      }
 
-  try {
-    const quizRows = await query("SELECT id, title FROM quizzes WHERE module_id=?", [moduleId]);
-    if (!quizRows.length) return res.json(null);
+      const { moduleId } = req.params;
 
-    const quizId = quizRows[0].id;
-
-    const qRows = await query(
-      "SELECT id, question, sort_order FROM quiz_questions WHERE quiz_id=? ORDER BY sort_order ASC",
-      [quizId]
-    );
-
-    const questions = [];
-    for (const q of qRows) {
-      const opts = await query(
-        "SELECT id, option_text, is_correct, sort_order FROM quiz_options WHERE question_id=? ORDER BY sort_order ASC",
-        [q.id]
+      // Ambil data modul dari database
+      const moduleRows = await query(
+        `SELECT id, title, description, file
+         FROM modules
+         WHERE id = ?`,
+        [moduleId]
       );
-      questions.push({
-        id: q.id,
-        question: q.question,
-        sort_order: q.sort_order,
-        options: opts.map(o => ({
-          id: o.id,
-          text: o.option_text,
-          is_correct: o.is_correct === 1,
-          sort_order: o.sort_order
-        }))
+
+      if (!moduleRows.length) {
+        return res.status(404).json({
+          message: "Modul tidak ditemukan"
+        });
+      }
+
+      const module = moduleRows[0];
+
+      // Prompt untuk AI
+      const prompt = `
+Buat quiz edukasi berdasarkan informasi modul berikut.
+
+JUDUL MODUL:
+${module.title}
+
+DESKRIPSI MODUL:
+${module.description || "Tidak ada deskripsi"}
+
+INSTRUKSI:
+Buat tepat 3 soal pilihan ganda dalam Bahasa Indonesia.
+
+Setiap soal wajib:
+- Memiliki tepat 4 pilihan jawaban.
+- Hanya memiliki tepat 1 jawaban benar.
+- Relevan dengan topik modul.
+- Menggunakan bahasa yang jelas dan mudah dipahami.
+- Tidak membuat pertanyaan yang ambigu.
+
+Kembalikan HANYA JSON valid.
+Jangan gunakan markdown.
+Jangan gunakan tanda backtick.
+Jangan memberikan penjelasan di luar JSON.
+
+Format JSON wajib:
+
+{
+  "title": "Quiz judul modul",
+  "questions": [
+    {
+      "question": "Pertanyaan pertama",
+      "options": [
+        {
+          "text": "Pilihan jawaban 1",
+          "is_correct": false
+        },
+        {
+          "text": "Pilihan jawaban 2",
+          "is_correct": true
+        },
+        {
+          "text": "Pilihan jawaban 3",
+          "is_correct": false
+        },
+        {
+          "text": "Pilihan jawaban 4",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "question": "Pertanyaan kedua",
+      "options": [
+        {
+          "text": "Pilihan jawaban 1",
+          "is_correct": true
+        },
+        {
+          "text": "Pilihan jawaban 2",
+          "is_correct": false
+        },
+        {
+          "text": "Pilihan jawaban 3",
+          "is_correct": false
+        },
+        {
+          "text": "Pilihan jawaban 4",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "question": "Pertanyaan ketiga",
+      "options": [
+        {
+          "text": "Pilihan jawaban 1",
+          "is_correct": false
+        },
+        {
+          "text": "Pilihan jawaban 2",
+          "is_correct": false
+        },
+        {
+          "text": "Pilihan jawaban 3",
+          "is_correct": true
+        },
+        {
+          "text": "Pilihan jawaban 4",
+          "is_correct": false
+        }
+      ]
+    }
+  ]
+}
+`;
+
+      // Panggil Groq AI
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content:
+              "Kamu adalah pembuat soal kuis edukasi lingkungan. Selalu kembalikan satu object JSON valid."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+
+        model: "llama-3.3-70b-versatile",
+
+        temperature: 0.2,
+
+        max_tokens: 2000,
+
+        response_format: {
+          type: "json_object"
+        }
+      });
+
+      // Ambil hasil AI
+      let aiText =
+        completion.choices[0].message.content.trim();
+
+      // Bersihkan markdown jika AI tetap mengirimkannya
+      aiText = aiText
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+      // Convert text JSON menjadi object JavaScript
+      const quizData = JSON.parse(aiText);
+
+      // Validasi judul dan jumlah soal
+      if (
+        !quizData.title ||
+        !Array.isArray(quizData.questions) ||
+        quizData.questions.length !== 3
+      ) {
+        return res.status(500).json({
+          message: "Format quiz dari AI tidak valid"
+        });
+      }
+
+      // Validasi setiap soal
+      for (const q of quizData.questions) {
+        if (
+          !q.question ||
+          !Array.isArray(q.options) ||
+          q.options.length !== 4
+        ) {
+          return res.status(500).json({
+            message: "Format soal dari AI tidak valid"
+          });
+        }
+
+        const correctCount = q.options.filter(
+          opt => opt.is_correct === true
+        ).length;
+
+        if (correctCount !== 1) {
+          return res.status(500).json({
+            message:
+              "Setiap soal AI harus memiliki tepat satu jawaban benar"
+          });
+        }
+      }
+
+      // Kirim hasil ke frontend
+      return res.json(quizData);
+
+    } catch (error) {
+      console.error(
+        "GENERATE QUIZ AI ERROR:",
+        error
+      );
+
+      return res.status(500).json({
+        message: "Gagal generate quiz dengan AI",
+        error: error.message
+      });
+    }
+  }
+);
+
+
+/* =========================
+   AMBIL QUIZ BY MODULE
+========================= */
+app.get(
+  "/api/admin/modules/:moduleId/quiz",
+  verifyToken,
+  requireAdmin,
+  async (req, res) => {
+    const { moduleId } = req.params;
+
+    try {
+      const quizRows = await query(
+        "SELECT id, title FROM quizzes WHERE module_id=?",
+        [moduleId]
+      );
+
+      if (!quizRows.length) {
+        return res.json(null);
+      }
+
+      const quizId = quizRows[0].id;
+
+      const qRows = await query(
+        `SELECT id, question, sort_order
+         FROM quiz_questions
+         WHERE quiz_id=?
+         ORDER BY sort_order ASC`,
+        [quizId]
+      );
+
+      const questions = [];
+
+      for (const q of qRows) {
+        const opts = await query(
+          `SELECT id,
+                  option_text,
+                  is_correct,
+                  sort_order
+           FROM quiz_options
+           WHERE question_id=?
+           ORDER BY sort_order ASC`,
+          [q.id]
+        );
+
+        questions.push({
+          id: q.id,
+          question: q.question,
+          sort_order: q.sort_order,
+
+          options: opts.map(o => ({
+            id: o.id,
+            text: o.option_text,
+            is_correct: o.is_correct === 1,
+            sort_order: o.sort_order
+          }))
+        });
+      }
+
+      res.json({
+        quizId,
+        moduleId: Number(moduleId),
+        title: quizRows[0].title,
+        questions
+      });
+
+    } catch (err) {
+      console.error(
+        "GET ADMIN QUIZ ERROR:",
+        err
+      );
+
+      res.status(500).json({
+        message: "Server error",
+        error: err.message
+      });
+    }
+  }
+);
+
+
+/* =========================
+   CREATE / REPLACE QUIZ
+========================= */
+app.post(
+  "/api/admin/modules/:moduleId/quiz",
+  verifyToken,
+  requireAdmin,
+  async (req, res) => {
+    const { moduleId } = req.params;
+    const { title, questions } = req.body;
+
+    if (
+      !title ||
+      !Array.isArray(questions) ||
+      questions.length === 0
+    ) {
+      return res.status(400).json({
+        message: "Invalid payload"
       });
     }
 
-    res.json({
-      quizId,
-      moduleId: Number(moduleId),
-      title: quizRows[0].title,
-      questions
-    });
-  } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-});
+    // Validasi semua soal
+    for (const q of questions) {
+      if (
+        !q.question ||
+        !Array.isArray(q.options) ||
+        q.options.length < 2
+      ) {
+        return res.status(400).json({
+          message:
+            "Each question must have options"
+        });
+      }
 
-// create/replace quiz by module (admin)
-app.post("/api/admin/modules/:moduleId/quiz", verifyToken, requireAdmin, async (req, res) => {
-  const { moduleId } = req.params;
-  const { title, questions } = req.body;
+      const correctCount =
+        q.options.filter(
+          o => o.is_correct
+        ).length;
 
-  if (!title || !Array.isArray(questions) || questions.length === 0) {
-    return res.status(400).json({ message: "Invalid payload" });
-  }
-
-  // validasi: tiap soal minimal 2 opsi, harus ada 1 benar
-  for (const q of questions) {
-    if (!q.question || !Array.isArray(q.options) || q.options.length < 2) {
-      return res.status(400).json({ message: "Each question must have options" });
-    }
-    const correctCount = q.options.filter(o => o.is_correct).length;
-    if (correctCount !== 1) {
-      return res.status(400).json({ message: "Each question must have exactly 1 correct option" });
-    }
-  }
-
-  const conn = await pool.promise().getConnection();
-  try {
-    await conn.beginTransaction();
-
-    // kalau sudah ada quiz → hapus
-    const existing = await conn.query("SELECT id FROM quizzes WHERE module_id=?", [moduleId]);
-    const existingRows = existing[0];
-    if (existingRows.length) {
-      await conn.query("DELETE FROM quizzes WHERE module_id=?", [moduleId]);
-    }
-
-    // create quiz
-    const [quizInsert] = await conn.query(
-      "INSERT INTO quizzes (module_id, title) VALUES (?, ?)",
-      [moduleId, title]
-    );
-    const quizId = quizInsert.insertId;
-
-    // insert questions + options
-    for (let i = 0; i < questions.length; i++) {
-      const q = questions[i];
-      const [qIns] = await conn.query(
-        "INSERT INTO quiz_questions (quiz_id, question, sort_order) VALUES (?, ?, ?)",
-        [quizId, q.question, i + 1]
-      );
-      const questionId = qIns.insertId;
-
-      for (let j = 0; j < q.options.length; j++) {
-        const opt = q.options[j];
-        await conn.query(
-          "INSERT INTO quiz_options (question_id, option_text, is_correct, sort_order) VALUES (?, ?, ?, ?)",
-          [questionId, opt.text, opt.is_correct ? 1 : 0, j + 1]
-        );
+      if (correctCount !== 1) {
+        return res.status(400).json({
+          message:
+            "Each question must have exactly 1 correct option"
+        });
       }
     }
 
-    await conn.commit();
-    res.status(201).json({ message: "Quiz saved", quizId });
-  } catch (err) {
-    await conn.rollback();
-    res.status(500).json({ message: "Server error", error: err.message });
-  } finally {
-    conn.release();
-  }
-});
+    const conn =
+      await pool.promise().getConnection();
 
-// delete quiz by module (admin)
-app.delete("/api/admin/modules/:moduleId/quiz", verifyToken, requireAdmin, async (req, res) => {
-  const { moduleId } = req.params;
-  try {
-    const result = await query("DELETE FROM quizzes WHERE module_id=?", [moduleId]);
-    if (result.affectedRows === 0) return res.status(404).json({ message: "Quiz not found" });
-    res.json({ message: "Quiz deleted" });
-  } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+    try {
+      await conn.beginTransaction();
+
+      // Cek apakah quiz sudah ada
+      const existing =
+        await conn.query(
+          "SELECT id FROM quizzes WHERE module_id=?",
+          [moduleId]
+        );
+
+      const existingRows = existing[0];
+
+      // Jika ada quiz lama, hapus terlebih dahulu
+      if (existingRows.length) {
+        await conn.query(
+          "DELETE FROM quizzes WHERE module_id=?",
+          [moduleId]
+        );
+      }
+
+      // Buat quiz baru
+      const [quizInsert] =
+        await conn.query(
+          `INSERT INTO quizzes
+           (module_id, title)
+           VALUES (?, ?)`,
+          [moduleId, title]
+        );
+
+      const quizId =
+        quizInsert.insertId;
+
+      // Simpan pertanyaan
+      for (
+        let i = 0;
+        i < questions.length;
+        i++
+      ) {
+        const q = questions[i];
+
+        const [qIns] =
+          await conn.query(
+            `INSERT INTO quiz_questions
+             (quiz_id, question, sort_order)
+             VALUES (?, ?, ?)`,
+            [
+              quizId,
+              q.question,
+              i + 1
+            ]
+          );
+
+        const questionId =
+          qIns.insertId;
+
+        // Simpan opsi jawaban
+        for (
+          let j = 0;
+          j < q.options.length;
+          j++
+        ) {
+          const opt =
+            q.options[j];
+
+          await conn.query(
+            `INSERT INTO quiz_options
+             (
+               question_id,
+               option_text,
+               is_correct,
+               sort_order
+             )
+             VALUES (?, ?, ?, ?)`,
+            [
+              questionId,
+              opt.text,
+              opt.is_correct ? 1 : 0,
+              j + 1
+            ]
+          );
+        }
+      }
+
+      await conn.commit();
+
+      res.status(201).json({
+        message: "Quiz saved",
+        quizId
+      });
+
+    } catch (err) {
+      await conn.rollback();
+
+      console.error(
+        "SAVE QUIZ ERROR:",
+        err
+      );
+
+      res.status(500).json({
+        message: "Server error",
+        error: err.message
+      });
+
+    } finally {
+      conn.release();
+    }
   }
-});
+);
+
+
+/* =========================
+   DELETE QUIZ BY MODULE
+========================= */
+app.delete(
+  "/api/admin/modules/:moduleId/quiz",
+  verifyToken,
+  requireAdmin,
+  async (req, res) => {
+    const { moduleId } = req.params;
+
+    try {
+      const result = await query(
+        "DELETE FROM quizzes WHERE module_id=?",
+        [moduleId]
+      );
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          message: "Quiz not found"
+        });
+      }
+
+      res.json({
+        message: "Quiz deleted"
+      });
+
+    } catch (err) {
+      console.error(
+        "DELETE QUIZ ERROR:",
+        err
+      );
+
+      res.status(500).json({
+        message: "Server error",
+        error: err.message
+      });
+    }
+  }
+);
 
 /* =========================
    USER - MODULES (READ)
