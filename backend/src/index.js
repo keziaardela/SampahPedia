@@ -1470,6 +1470,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Upload gambar sampah dan analisis dengan Gemini AI
 app.post("/api/scan-sampah", upload.single("image"), async (req, res) => {
   try {
     if (!genAI) {
@@ -1493,6 +1494,7 @@ app.post("/api/scan-sampah", upload.single("image"), async (req, res) => {
       };
     };
 
+    // Konversi file gambar menjadi bagian generatif untuk Gemini AI
     const imagePart = fileToGenerativePart(req.file);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
@@ -1668,6 +1670,9 @@ app.get("/gemini-test", async (req, res) => {
   }
 });
 
+/* ======================
+   CHATBOT AI (GROQ)
+====================== */
 app.post("/api/ask-ai", async (req, res) => {
   try {
     if (!groq) {
