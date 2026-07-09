@@ -24,6 +24,13 @@ if (process.env.GEMINI_API_KEY) {
   genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 }
 
+console.log(
+  "KEY GEMINI TERBACA:",
+  process.env.GEMINI_API_KEY
+    ? process.env.GEMINI_API_KEY.slice(0, 8) + "..."
+    : "TIDAK ADA"
+);
+
 const app = express();
 console.log("🔥 SERVER FILE: src/index.js AKTIF");
 const port = 3000;
@@ -1459,6 +1466,9 @@ app.post("/api/forum", verifyToken, async (req, res) => {
 /* ======================
    MULTER (UPLOAD GAMBAR)
 ====================== */
+
+// Storage untuk file yang memang perlu disimpan,
+// misalnya gambar berita
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -1468,108 +1478,208 @@ const storage = multer.diskStorage({
   }
 });
 
+// Upload biasa untuk fitur berita
 const upload = multer({ storage });
 
-// Upload gambar sampah dan analisis dengan Gemini AI
-app.post("/api/scan-sampah", upload.single("image"), async (req, res) => {
-  try {
-    if (!genAI) {
-      return res.status(503).json({ success: false, message: "Gemini AI belum dikonfigurasi" });
-    }
 
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: "Gambar wajib diunggah" });
-    }
-
-    // Amankan pengambilan teks pertanyaan agar tidak memicu undefined error
-    const userQuestion = req.body.question ? String(req.body.question).trim() : "";
-
-    const fs = require("fs");
-    const fileToGenerativePart = (file) => {
-      return {
-        inlineData: {
-          data: Buffer.from(fs.readFileSync(file.path)).toString("base64"),
-          mimeType: file.mimetype
-        },
-      };
-    };
-
-    // Konversi file gambar menjadi bagian generatif untuk Gemini AI
-    const imagePart = fileToGenerativePart(req.file);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    let prompt = "";
-    if (userQuestion !== "") {
-      prompt = `
-        Analisis gambar sampah yang dilampirkan dan jawab pertanyaan pengguna berikut: "${userQuestion}"
-        
-        Aturan format jawaban:
-        - Jawab dalam Bahasa Indonesia yang ramah.
-        - Gunakan format HTML langsung (tag <ul>, <li>, atau <p> jika perlu).
-        - JANGAN PERNAH membungkus dengan tanda backtick markdown seperti \`\`\`html.
-        - Jawaban singkat, padat, dan sangat relevan dengan pengelolaan sampah/lingkungan.
-      `;
-    } else {
-      prompt = `
-        Analisis gambar sampah ini dan berikan informasi berikut dalam Bahasa Indonesia:
-        1. Apa nama benda/sampah ini?
-        2. Apa kategori jenis sampahnya? (Organik, Anorganik, atau B3)
-        3. Bagaimana cara membuang atau mendaur ulangnya dengan benar?
-        
-        Aturan format jawaban:
-        - Gunakan format HTML langsung (gunakan tag <ul> dan <li> untuk daftar).
-        - JANGAN PERNAH membungkus dengan tanda backtick markdown seperti \`\`\`html.
-        - Maksimal 4 poin singkat.
-      `;
-    }
-
-    const result = await model.generateContent([prompt, imagePart]);
-    let responseText = result.response.text();
-
-    // Hapus file fisik sementara dari folder uploads
-    try {
-      if (fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-    } catch (fsError) {
-      console.error("⚠️ Gagal menghapus file sementara:", fsError.message);
-    }
-
-    responseText = responseText.replace(/```html/g, "").replace(/```/g, "").trim();
-
-    // SIMPAN KE DATABASE DENGAN TRY-CATCH AMAN
-    try {
-      const activeSession = req.body.sessionId ? String(req.body.sessionId) : "default-session";
-      const userText = userQuestion !== "" ? userQuestion : "[User mengirim foto sampah untuk dianalisis]";
-
-      await query(
-        "INSERT INTO chat_histories (session_id, role, content) VALUES (?, 'user', ?)", 
-        [activeSession, userText]
-      );
-      await query(
-        "INSERT INTO chat_histories (session_id, role, content) VALUES (?, 'model', ?)", 
-        [activeSession, String(responseText)]
-      );
-      
-      console.log("✅ Berhasil merekam riwayat scan ke database untuk sesi:", activeSession);
-    } catch (dbError) {
-      // Jika database gagal, cetak error di log VS Code tetapi JANGAN gagalkan kiriman response ke user
-      console.error("⚠️ DATABASE ERROR SAAT SCAN GAMBAR:", dbError.message);
-    }
-
-    return res.json({
-      success: true,
-      answer: responseText
-    });
-
-  } catch (error) {
-    console.error("🔥 GEMINI MULTIMODAL SCAN ERROR:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Gagal memproses analisis gambar di server. Periksa ukuran file gambar Anda." 
-    });
-  }
+// Upload khusus scan Gemini
+// Gambar hanya disimpan sementara di memory,
+// tidak masuk ke folder uploads
+const scanUpload = multer({
+  storage: multer.memoryStorage()
 });
+
+
+// Upload gambar sampah dan analisis dengan Gemini AI
+app.post(
+  "/api/scan-sampah",
+  scanUpload.single("image"),
+  async (req, res) => {
+
+    try {
+
+      // Validasi konfigurasi Gemini AI
+      if (!genAI) {
+        return res.status(503).json({
+          success: false,
+          message: "Gemini AI belum dikonfigurasi"
+        });
+      }
+
+
+      // Validasi gambar
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "Gambar wajib diunggah"
+        });
+      }
+
+
+      // Ambil pertanyaan pengguna
+      const userQuestion = req.body.question
+        ? String(req.body.question).trim()
+        : "";
+
+
+      // Konversi buffer gambar menjadi format Gemini
+      const fileToGenerativePart = (file) => {
+        return {
+          inlineData: {
+            data: file.buffer.toString("base64"),
+            mimeType: file.mimetype
+          }
+        };
+      };
+
+
+      // Siapkan gambar untuk Gemini
+      const imagePart = fileToGenerativePart(req.file);
+
+
+      // Pilih model Gemini
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash"
+      });
+
+
+      // Prompt Gemini
+      let prompt = "";
+
+      if (userQuestion !== "") {
+
+        prompt = `
+          Analisis gambar sampah yang dilampirkan dan jawab
+          pertanyaan pengguna berikut: "${userQuestion}"
+
+          Aturan format jawaban:
+          - Jawab dalam Bahasa Indonesia yang ramah.
+          - Gunakan format HTML langsung
+            (tag <ul>, <li>, atau <p> jika perlu).
+          - JANGAN PERNAH membungkus dengan tanda
+            backtick markdown seperti \`\`\`html.
+          - Jawaban singkat, padat, dan sangat relevan
+            dengan pengelolaan sampah/lingkungan.
+        `;
+
+      } else {
+
+        prompt = `
+          Analisis gambar sampah ini dan berikan informasi
+          berikut dalam Bahasa Indonesia:
+
+          1. Apa nama benda/sampah ini?
+          2. Apa kategori jenis sampahnya?
+             (Organik, Anorganik, atau B3)
+          3. Bagaimana cara membuang atau mendaur ulangnya
+             dengan benar?
+
+          Aturan format jawaban:
+          - Gunakan format HTML langsung
+            (gunakan tag <ul> dan <li> untuk daftar).
+          - JANGAN PERNAH membungkus dengan tanda
+            backtick markdown seperti \`\`\`html.
+          - Maksimal 4 poin singkat.
+        `;
+      }
+
+
+      // Kirim gambar dan prompt ke Gemini AI
+      const result = await model.generateContent([
+        prompt,
+        imagePart
+      ]);
+
+
+      // Ambil hasil jawaban Gemini
+      let responseText = result.response.text();
+
+
+      // Bersihkan markdown jika masih diberikan Gemini
+      responseText = responseText
+        .replace(/```html/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+
+      /* ======================
+         SIMPAN RIWAYAT CHAT
+      ====================== */
+
+      try {
+
+        const activeSession = req.body.sessionId
+          ? String(req.body.sessionId)
+          : "default-session";
+
+
+        const userText = userQuestion !== ""
+          ? userQuestion
+          : "[User mengirim foto sampah untuk dianalisis]";
+
+
+        // Simpan pesan pengguna
+        await query(
+          `INSERT INTO chat_histories
+           (session_id, role, content)
+           VALUES (?, 'user', ?)`,
+          [
+            activeSession,
+            userText
+          ]
+        );
+
+
+        // Simpan jawaban Gemini
+        await query(
+          `INSERT INTO chat_histories
+           (session_id, role, content)
+           VALUES (?, 'model', ?)`,
+          [
+            activeSession,
+            String(responseText)
+          ]
+        );
+
+
+        console.log(
+          "✅ Berhasil merekam riwayat scan ke database untuk sesi:",
+          activeSession
+        );
+
+      } catch (dbError) {
+
+        // Database gagal tidak menggagalkan respons Gemini
+        console.error(
+          "⚠️ DATABASE ERROR SAAT SCAN GAMBAR:",
+          dbError.message
+        );
+      }
+
+
+      // Kirim jawaban ke frontend
+      return res.json({
+        success: true,
+        answer: responseText
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "🔥 GEMINI MULTIMODAL SCAN ERROR:",
+        error
+      );
+
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Gagal memproses analisis gambar di server. Periksa ukuran file gambar Anda."
+      });
+    }
+  }
+);
 
 /* ======================
    BERITA KEGIATAN
